@@ -21,6 +21,8 @@
 - Login credentials are read from `ADMIN_EMAILS`/`ADMIN_EMAIL` and `ADMIN_PASSWORD`.
 - `/admin/login` redirects authenticated users to `/admin`; unauthenticated users visiting `/admin/*` redirect to `/admin/login`.
 - `/admin/logout` clears the admin session cookie and redirects back to login.
+- Vercel build failed because Prisma Client was not generated before Next collected route data.
+- `package.json` now runs `prisma generate` on `postinstall` and `prebuild`.
 
 ## Touched Files
 - `lib/db.ts`
@@ -48,12 +50,15 @@
 - `components/ui/Footer.tsx`
 - `prisma/seed.ts`
 - `middleware.ts`
+- `package.json`
 
 ## Verification
 - `npm run lint` passes.
 - `npx tsc --noEmit` passes.
 - `npx prisma validate` passes.
 - `npm run lint` and `npx tsc --noEmit` pass after the admin login implementation.
+- `npm run lint` and `npx tsc --noEmit` pass after the Vercel Prisma build script fix.
+- Local `npm run prebuild` could not complete because an orphaned Node process is locking `node_modules\.prisma\client\query_engine-windows.dll.node`.
 - `npm run build` compiled once but failed on stale `.next`; after `.next` deletion, build hung and left orphaned Next worker processes that Windows denied terminating.
 
 ## Remaining Risks
