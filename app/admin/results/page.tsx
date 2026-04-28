@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { logDatabaseIssue } from '@/lib/db';
 import Link from 'next/link';
-import { ArrowLeft, Trophy } from 'lucide-react';
+import { ArrowLeft, Edit2 } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 
 export const dynamic = 'force-dynamic';
@@ -38,9 +38,9 @@ export default async function AdminResultsPage() {
             <h1 className="text-4xl font-serif text-venite-green mb-2">Live Rankings</h1>
             <p className="text-sm opacity-60">Real-time candidate standings based on verified Paystack transactions.</p>
           </div>
-          <button className="px-5 py-2.5 bg-venite-green text-cream rounded-full text-xs uppercase tracking-widest font-bold hover:bg-venite-gold transition-colors flex items-center gap-2">
-            <Trophy className="w-4 h-4" /> Export Report
-          </button>
+          <Link href="/admin/candidates" className="px-5 py-2.5 bg-venite-green text-cream rounded-full text-xs uppercase tracking-widest font-bold hover:bg-venite-gold transition-colors flex items-center gap-2">
+            <Edit2 className="w-4 h-4" /> Edit Candidates
+          </Link>
         </div>
 
         {categories.length === 0 ? (
@@ -53,9 +53,14 @@ export default async function AdminResultsPage() {
             
             return (
               <GlassCard key={category.id} className="bg-white/50 border-venite-green/5 p-8">
-                <div className="flex justify-between items-baseline mb-6 border-b border-venite-green/10 pb-4">
-                  <h2 className="text-2xl font-serif text-venite-green">{category.name}</h2>
-                  <span className="text-sm font-mono font-bold text-venite-gold bg-venite-gold/10 px-3 py-1 rounded-full">{totalVotes} Total Votes</span>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-4 mb-6 border-b border-venite-green/10 pb-4">
+                  <div>
+                    <h2 className="text-2xl font-serif text-venite-green">{category.name}</h2>
+                    <Link href="/admin/categories" className="mt-2 inline-flex items-center gap-1 text-[10px] uppercase tracking-widest font-bold text-venite-green/50 hover:text-venite-gold transition-colors">
+                      <Edit2 className="w-3 h-3" /> Edit Category
+                    </Link>
+                  </div>
+                  <span className="text-sm font-mono font-bold text-venite-gold bg-venite-gold/10 px-3 py-1 rounded-full w-fit">{totalVotes} Total Votes</span>
                 </div>
                 
                 <div className="space-y-6">
@@ -75,6 +80,9 @@ export default async function AdminResultsPage() {
                               <span className="text-[10px] uppercase tracking-widest opacity-50 hidden sm:inline-block">
                                 {candidate.department} {candidate.level ? `- ${candidate.level}` : ''}
                               </span>
+                              <Link href="/admin/candidates" className="text-[10px] uppercase tracking-widest font-bold text-venite-green/40 hover:text-venite-gold transition-colors hidden md:inline-flex items-center gap-1">
+                                <Edit2 className="w-3 h-3" /> Edit
+                              </Link>
                             </div>
                             <span className="font-mono font-bold text-venite-green text-lg">{candidate.voteCount}</span>
                           </div>

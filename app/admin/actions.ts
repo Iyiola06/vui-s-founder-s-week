@@ -26,6 +26,15 @@ export async function createEventDay(data: { title: string; date: Date; descript
   revalidatePath('/programme');
 }
 
+export async function updateEventDay(id: string, data: { title: string; date: Date; description?: string }) {
+  await runAdminMutation('update event day', async () => {
+    await prisma.eventDay.update({ where: { id }, data });
+  });
+  revalidatePath('/admin/events');
+  revalidatePath('/');
+  revalidatePath('/programme');
+}
+
 export async function deleteEventDay(id: string) {
   await runAdminMutation('delete event day', async () => {
     await prisma.eventDay.delete({ where: { id } });
@@ -72,11 +81,65 @@ export async function createCandidate(data: { name: string; department?: string;
   revalidatePath('/voting');
 }
 
+export async function updateCandidate(id: string, data: { name: string; department?: string; level?: string; categoryId: string }) {
+  await runAdminMutation('update candidate', async () => {
+    await prisma.candidate.update({ where: { id }, data });
+  });
+  revalidatePath('/admin/candidates');
+  revalidatePath('/admin/results');
+  revalidatePath('/voting');
+}
+
 export async function deleteCandidate(id: string) {
   await runAdminMutation('delete candidate', async () => {
     await prisma.candidate.delete({ where: { id } });
   });
   revalidatePath('/admin/candidates');
+  revalidatePath('/voting');
+}
+
+// Payments
+export async function updateVoteTransaction(
+  id: string,
+  data: { email: string; amount: number; voteQuantity: number; status: string; candidateId: string }
+) {
+  await runAdminMutation('update vote transaction', async () => {
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.voteTransaction.findUnique({ where: { id } });
+
+      if (!existing) {
+        throw new Error('Transaction not found.');
+      }
+
+      if (existing.status === 'success') {
+        const oldCandidate = await tx.candidate.findUnique({ where: { id: existing.candidateId } });
+        if (oldCandidate) {
+          await tx.candidate.update({
+            where: { id: existing.candidateId },
+            data: { voteCount: Math.max(0, oldCandidate.voteCount - existing.voteQuantity) },
+          });
+        }
+      }
+
+      await tx.voteTransaction.update({
+        where: { id },
+        data,
+      });
+
+      if (data.status === 'success') {
+        const newCandidate = await tx.candidate.findUnique({ where: { id: data.candidateId } });
+        if (newCandidate) {
+          await tx.candidate.update({
+            where: { id: data.candidateId },
+            data: { voteCount: newCandidate.voteCount + data.voteQuantity },
+          });
+        }
+      }
+    });
+  });
+  revalidatePath('/admin/payments');
+  revalidatePath('/admin/results');
+  revalidatePath('/admin');
   revalidatePath('/voting');
 }
 

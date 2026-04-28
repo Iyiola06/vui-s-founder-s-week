@@ -23,6 +23,9 @@
 - `/admin/logout` clears the admin session cookie and redirects back to login.
 - Vercel build failed because Prisma Client was not generated before Next collected route data.
 - `package.json` now runs `prisma generate` on `postinstall` and `prebuild`.
+- Admin events, candidates, and payments now have edit UI plus server-side update actions.
+- Payment transaction edits keep candidate vote totals consistent when status, candidate, or vote quantity changes.
+- Admin results now includes edit shortcuts to categories and candidates.
 
 ## Touched Files
 - `lib/db.ts`
@@ -33,6 +36,7 @@
 - `app/voting/page.tsx`
 - `app/dinner-night/page.tsx`
 - `app/admin/actions.ts`
+- `app/admin/payments/AdminPaymentsClient.tsx`
 - `app/admin/page.tsx`
 - `app/admin/events/page.tsx`
 - `app/admin/categories/page.tsx`
