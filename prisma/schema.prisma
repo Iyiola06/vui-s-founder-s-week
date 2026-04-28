@@ -1,0 +1,73 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model EventDay {
+  id          String   @id @default(cuid())
+  date        DateTime
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model VotingCategory {
+  id           String      @id @default(cuid())
+  name         String
+  description  String?
+  pricePerVote Float       @default(500) // Price in NGN
+  isOpen       Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  candidates   Candidate[]
+}
+
+model Candidate {
+  id           String         @id @default(cuid())
+  name         String
+  department   String?
+  level        String?
+  imageUrl     String?
+  voteCount    Int            @default(0)
+  categoryId   String
+  category     VotingCategory @relation(fields: [categoryId], references: [id])
+  transactions VoteTransaction[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model VoteTransaction {
+  id           String    @id @default(cuid())
+  reference    String    @unique // Paystack transaction reference
+  amount       Float
+  voteQuantity Int       @default(1)
+  status       String    // pending, success, failed, abandoned
+  email        String
+  candidateId  String
+  candidate    Candidate @relation(fields: [candidateId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // Hashed password
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
