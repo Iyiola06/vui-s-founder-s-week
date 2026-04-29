@@ -1,6 +1,15 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { LoadingState } from '@/components/ui/LoadingState';
 import SuccessClient from './SuccessClient';
+import { createMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = createMetadata({
+  title: 'Payment Verification',
+  description: "Founder's Week payment verification page.",
+  path: '/voting/success',
+  noIndex: true,
+});
 
 export default function SuccessPage() {
   return (

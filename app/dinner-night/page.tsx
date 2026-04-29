@@ -1,29 +1,135 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { logDatabaseIssue } from '@/lib/db';
+import { JsonLd } from '@/components/seo/JsonLd';
 import { FloatingNav } from '@/components/ui/FloatingNav';
 import { Footer } from '@/components/ui/Footer';
-import { ArrowLeft, MapPin, Clock, Calendar, Star, ShieldCheck, CheckCircle2, Music, Wine, Award } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Calendar, Star, ShieldCheck, Music, Wine, Award } from 'lucide-react';
+import {
+  absoluteUrl,
+  buildLagosDateTime,
+  createBreadcrumbJsonLd,
+  createMetadata,
+  formatEventDate,
+  siteConfig,
+} from '@/lib/seo';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 900;
+
+export const metadata: Metadata = createMetadata({
+  title: 'Dinner and Awards Night',
+  description:
+    "Discover the Venite University Founder's Week Dinner and Awards Night programme, venue details, dress code, and award categories.",
+  path: '/dinner-night',
+  keywords: [
+    'Venite University dinner night',
+    'Founders Week awards night',
+    'Venite University grand finale',
+  ],
+});
 
 export default async function DinnerNightPage() {
   let categories: any[] = [];
+  let dinnerEventDate = new Date(siteConfig.eventWindow.dinnerDate);
+  let dinnerVenue = 'Main University Hall';
+  let dinnerTime = '7:00 PM';
+
   try {
-    categories = await prisma.votingCategory.findMany({
-      where: { isOpen: true },
-      orderBy: { name: 'asc' }
-    });
+    const [categoryRecords, dinnerEvent, settings] = await Promise.all([
+      prisma.votingCategory.findMany({
+        where: { isOpen: true },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.eventDay.findFirst({
+        where: {
+          OR: [
+            { title: { contains: 'Dinner', mode: 'insensitive' } },
+            { title: { contains: 'Awards', mode: 'insensitive' } },
+            { title: { contains: 'Sports', mode: 'insensitive' } },
+            { title: { contains: 'Saturday', mode: 'insensitive' } },
+          ],
+        },
+        orderBy: { date: 'asc' },
+        select: { date: true },
+      }),
+      prisma.siteSetting.findMany({
+        where: {
+          key: {
+            in: ['dinnerVenue', 'dinnerTime'],
+          },
+        },
+        select: {
+          key: true,
+          value: true,
+        },
+      }),
+    ]);
+
+    categories = categoryRecords;
+    dinnerEventDate = dinnerEvent?.date ?? dinnerEventDate;
+
+    const settingsMap = Object.fromEntries(
+      settings.map((setting) => [setting.key, setting.value.trim()])
+    );
+
+    dinnerVenue = settingsMap.dinnerVenue || dinnerVenue;
+    dinnerTime = settingsMap.dinnerTime || dinnerTime;
   } catch (error) {
     logDatabaseIssue('dinner night page categories', error);
   }
 
+  const dinnerDateLabel = formatEventDate(dinnerEventDate, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+  const dinnerStartDate = buildLagosDateTime(dinnerEventDate, dinnerTime);
+
+  const breadcrumbJsonLd = createBreadcrumbJsonLd([
+    { name: 'Home', path: '/' },
+    { name: 'Dinner and Awards Night', path: '/dinner-night' },
+  ]);
+  const dinnerJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: "Venite University Founder's Week Dinner and Awards Night",
+    description:
+      "Grand finale dinner and awards celebration for Venite University's Founder's Week 2026.",
+    url: `${siteConfig.baseUrl}/dinner-night`,
+    image: [absoluteUrl(siteConfig.ogImagePath)],
+    startDate: dinnerStartDate,
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    eventStatus: 'https://schema.org/EventScheduled',
+    location: {
+      '@type': 'Place',
+      name: dinnerVenue,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: siteConfig.venue.addressLocality,
+        addressRegion: siteConfig.venue.addressRegion,
+        addressCountry: siteConfig.venue.addressCountry,
+      },
+    },
+    organizer: {
+      '@type': 'CollegeOrUniversity',
+      name: siteConfig.organizer.name,
+      url: siteConfig.organizer.url,
+    },
+    about: categories.map((category) => ({
+      '@type': 'Thing',
+      name: category.name,
+    })),
+  };
+
   return (
     <div className="w-full min-h-screen bg-deep-green text-cream font-sans overflow-x-hidden selection:bg-champagne-gold selection:text-deep-green">
       <FloatingNav />
-      
-      {/* Hero Section */}
-      <section className="relative pt-40 pb-32 px-6 overflow-hidden min-h-[90vh] flex flex-col items-center justify-center text-center">
+      <main>
+        <JsonLd data={[breadcrumbJsonLd, dinnerJsonLd]} />
+
+        {/* Hero Section */}
+        <section className="relative pt-40 pb-32 px-6 overflow-hidden min-h-[90vh] flex flex-col items-center justify-center text-center">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] max-w-[800px] h-[80vw] max-h-[800px] radial-glow-gold rounded-full opacity-20 pointer-events-none blur-3xl" />
         
         <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center">
@@ -38,7 +144,7 @@ export default async function DinnerNightPage() {
           </h1>
           
           <p className="text-lg md:text-2xl text-white/60 font-light max-w-2xl mx-auto leading-relaxed mb-12">
-            A refined evening of celebration, recognition, elegance, and community to close out Founder&apos;s Week.
+            A refined Venite University evening of celebration, recognition, elegance, and community to close out Founder&apos;s Week 2026.
           </p>
 
           <Link href="/voting">
@@ -47,25 +153,25 @@ export default async function DinnerNightPage() {
             </button>
           </Link>
         </div>
-      </section>
+        </section>
 
-      {/* Event Details Bento */}
-      <section className="py-20 px-6 max-w-6xl mx-auto relative z-20 -mt-20">
+        {/* Event Details Bento */}
+        <section className="py-20 px-6 max-w-6xl mx-auto relative z-20 -mt-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="glass-panel-dark p-8 rounded-[32px] flex flex-col justify-end h-64 border-white/10 group">
             <Calendar className="w-8 h-8 text-champagne-gold mb-auto opacity-50 group-hover:opacity-100 transition-opacity" />
             <span className="text-[10px] uppercase font-bold tracking-widest text-white/40 mb-2">Date</span>
-            <p className="font-serif text-3xl">Saturday Night</p>
+            <p className="font-serif text-3xl">{dinnerDateLabel}</p>
           </div>
           <div className="glass-panel-dark p-8 rounded-[32px] flex flex-col justify-end h-64 border-white/10 group">
             <Clock className="w-8 h-8 text-champagne-gold mb-auto opacity-50 group-hover:opacity-100 transition-opacity" />
             <span className="text-[10px] uppercase font-bold tracking-widest text-white/40 mb-2">Time</span>
-            <p className="font-serif text-3xl">7:00 PM</p>
+            <p className="font-serif text-3xl">{dinnerTime}</p>
           </div>
           <div className="glass-panel-dark p-8 rounded-[32px] flex flex-col justify-end h-64 border-white/10 group">
             <MapPin className="w-8 h-8 text-champagne-gold mb-auto opacity-50 group-hover:opacity-100 transition-opacity" />
             <span className="text-[10px] uppercase font-bold tracking-widest text-white/40 mb-2">Venue</span>
-            <p className="font-serif text-3xl text-white/80 text-xl">Main University Hall</p>
+            <p className="font-serif text-3xl text-white/80 text-xl">{dinnerVenue}</p>
           </div>
           <div className="glass-panel-dark p-8 rounded-[32px] flex flex-col justify-end h-64 border-champagne-gold/30 bg-gradient-to-br from-champagne-gold/10 to-transparent group">
             <Star className="w-8 h-8 text-champagne-gold mb-auto opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -73,10 +179,10 @@ export default async function DinnerNightPage() {
             <p className="font-serif text-3xl text-champagne-gold">Elegant & Formal</p>
           </div>
         </div>
-      </section>
+        </section>
 
-      {/* Categories of Excellence */}
-      <section className="py-32 px-6 max-w-7xl mx-auto">
+        {/* Categories of Excellence */}
+        <section className="py-32 px-6 max-w-7xl mx-auto">
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl lg:text-7xl font-serif tracking-tight mb-6 mt-12">Excellence Recognized</h2>
           <p className="text-white/60 max-w-xl mx-auto text-lg leading-relaxed">
@@ -108,10 +214,10 @@ export default async function DinnerNightPage() {
              </button>
           </Link>
         </div>
-      </section>
+        </section>
 
-      {/* Programme Section */}
-      <section className="py-32 bg-cream text-text-dark border-t border-warm-border/50 relative overflow-hidden">
+        {/* Programme Section */}
+        <section className="py-32 bg-cream text-text-dark border-t border-warm-border/50 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-[500px] h-[500px] radial-glow rounded-full opacity-40 -translate-y-1/2 -translate-x-1/4 pointer-events-none" />
         <div className="max-w-4xl mx-auto px-6 relative z-10">
           <div className="text-center mb-24">
@@ -163,10 +269,10 @@ export default async function DinnerNightPage() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
 
-      {/* Voting CTA Panel */}
-      <section className="py-24 px-6 max-w-5xl mx-auto mb-20 relative z-10">
+        {/* Voting CTA Panel */}
+        <section className="py-24 px-6 max-w-5xl mx-auto mb-20 relative z-10">
         <div className="bg-deep-green border border-champagne-gold/20 rounded-[32px] p-12 text-center shadow-2xl shadow-deep-green/50 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-[400px] h-[400px] radial-glow-gold rounded-full opacity-20 -translate-y-1/2 translate-x-1/4 pointer-events-none group-hover:scale-110 transition-transform duration-1000" />
           
@@ -184,7 +290,8 @@ export default async function DinnerNightPage() {
             </Link>
           </div>
         </div>
-      </section>
+        </section>
+      </main>
 
       <Footer />
     </div>

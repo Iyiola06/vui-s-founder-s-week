@@ -1,16 +1,48 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { logDatabaseIssue } from '@/lib/db';
-import { ArrowRight, Sparkles, MapPin, Ticket, Award, CalendarDays, Mic2, Star, Users2 } from 'lucide-react';
+import { ArrowRight, Sparkles, Ticket, Award, CalendarDays, Mic2, Star, Users2 } from 'lucide-react';
+import { JsonLd } from '@/components/seo/JsonLd';
 import { FloatingNav } from '@/components/ui/FloatingNav';
 import { Footer } from '@/components/ui/Footer';
+import { absoluteUrl, createMetadata, siteConfig } from '@/lib/seo';
 
-export const dynamic = 'force-dynamic';
+type EventDayLike = {
+  id?: string;
+  title: string;
+  description: string | null;
+  date: Date | string;
+  isSaturday?: boolean;
+};
+
+const fallbackEvents: EventDayLike[] = [
+  { title: 'Debate and Talk Show', description: 'Students engage in intellectual discourse on national development.', date: new Date('2026-05-11') },
+  { title: 'College Lectures', description: 'Academic showcase from Agriculture, Computing and Engineering.', date: new Date('2026-05-12') },
+  { title: 'Talent Show', description: 'A night of music, art, and creative performances.', date: new Date('2026-05-13') },
+  { title: 'Cultural Day', description: 'Celebrating our extraordinary Nigerian heritage.', date: new Date('2026-05-14') },
+  { title: "Founder's Day Ceremony", description: "The official Founder's Day event.", date: new Date('2026-05-15') },
+  { title: 'Sports & Dinner Awards', description: 'Morning athletics followed by the grand elegance dinner.', date: new Date('2026-05-16'), isSaturday: true },
+  { title: 'Thanksgiving', description: 'A Sunday service of gratitude to conclude the week.', date: new Date('2026-05-17') },
+];
+
+export const revalidate = 900;
+
+export const metadata: Metadata = createMetadata({
+  title: 'Official Event Portal',
+  description:
+    "Explore the official Venite University Founder's Week 2026 portal for the full programme, dinner and awards updates, and secure student voting.",
+  path: '/',
+  keywords: [
+    "Venite University Founder's Week portal",
+    "Founder's Week 2026 schedule",
+    'Venite University voting portal',
+  ],
+});
 
 export default async function Home() {
-  let eventDays: any[] = [];
+  let eventDays: EventDayLike[] = [];
   let categories: any[] = [];
-  let isDbConnected = true;
 
   try {
     eventDays = await prisma.eventDay.findMany({
@@ -28,28 +60,81 @@ export default async function Home() {
     });
   } catch (error) {
     logDatabaseIssue('home page data', error);
-    isDbConnected = false;
   }
 
-  // Fallback data if DB is empty or fails
-  const fallbackEvents = [
-    { title: 'Debate and Talk Show', description: 'Students engage in intellectual discourse on national development.', date: new Date('2026-05-11') },
-    { title: 'College Lectures', description: 'Academic showcase from Agriculture, Computing and Engineering.', date: new Date('2026-05-12') },
-    { title: 'Talent Show', description: 'A night of music, art, and creative performances.', date: new Date('2026-05-13') },
-    { title: 'Cultural Day', description: 'Celebrating our extraordinary Nigerian heritage.', date: new Date('2026-05-14') },
-    { title: "Founder's Day Ceremony", description: "The official Founder's Day event.", date: new Date('2026-05-15') },
-    { title: 'Sports & Dinner Awards', description: 'Morning athletics followed by the grand elegance dinner.', date: new Date('2026-05-16'), isSaturday: true },
-    { title: 'Thanksgiving', description: 'A Sunday service of gratitude to conclude the week.', date: new Date('2026-05-17') },
-  ];
-
   const displayEvents = eventDays.length > 0 ? eventDays : fallbackEvents;
+  const firstEvent = displayEvents[0];
+  const lastEvent = displayEvents[displayEvents.length - 1];
+
+  const festivalJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Festival',
+    name: siteConfig.name,
+    description:
+      "Official Venite University Founder's Week 2026 programme featuring academic events, culture, sports, dinner and awards, and thanksgiving.",
+    url: siteConfig.baseUrl,
+    image: [absoluteUrl(siteConfig.ogImagePath)],
+    startDate: firstEvent ? new Date(firstEvent.date).toISOString() : siteConfig.eventWindow.startDate,
+    endDate: lastEvent ? new Date(lastEvent.date).toISOString() : siteConfig.eventWindow.endDate,
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    eventStatus: 'https://schema.org/EventScheduled',
+    location: {
+      '@type': 'Place',
+      name: siteConfig.venue.name,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: siteConfig.venue.addressLocality,
+        addressRegion: siteConfig.venue.addressRegion,
+        addressCountry: siteConfig.venue.addressCountry,
+      },
+    },
+    organizer: {
+      '@type': 'CollegeOrUniversity',
+      name: siteConfig.organizer.name,
+      url: siteConfig.organizer.url,
+    },
+    subEvent: displayEvents.map((event) => ({
+      '@type': 'Event',
+      name: event.title,
+      description: event.description ?? undefined,
+      startDate: new Date(event.date).toISOString(),
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      eventStatus: 'https://schema.org/EventScheduled',
+      location: {
+        '@type': 'Place',
+        name: siteConfig.venue.name,
+      },
+    })),
+  };
+
+  const featuredCategoriesJsonLd =
+    categories.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'Featured Founder\'s Week award categories',
+          itemListElement: categories.map((category, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+              '@type': 'Thing',
+              name: category.name,
+              description:
+                category.description ??
+                `${category._count.candidates} nominees available for voting.`,
+            },
+          })),
+        }
+      : null;
 
   return (
     <div className="w-full min-h-screen bg-cream text-text-dark font-sans overflow-x-hidden selection:bg-champagne-gold selection:text-text-dark">
       <FloatingNav />
-      
-      {/* 1. Cinematic Hero */}
-      <section className="relative min-h-[95vh] w-full flex flex-col justify-center items-center px-6 pt-32 overflow-hidden">
+      <main>
+        <JsonLd data={featuredCategoriesJsonLd ? [festivalJsonLd, featuredCategoriesJsonLd] : festivalJsonLd} />
+
+        {/* 1. Cinematic Hero */}
+        <section className="relative min-h-[95vh] w-full flex flex-col justify-center items-center px-6 pt-32 overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] max-w-[800px] h-[80vw] max-h-[800px] radial-glow rounded-full opacity-60 pointer-events-none" />
         <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] radial-glow-gold rounded-full opacity-30 pointer-events-none blur-3xl" />
         
@@ -65,7 +150,7 @@ export default async function Home() {
           </h1>
 
           <p className="text-base md:text-xl text-muted-text font-light max-w-2xl balance mb-12 leading-relaxed">
-            A week-long celebration of vision, excellence, culture, talent, sports, awards, and thanksgiving.
+            Join Venite University Iloro-Ekiti for Founder&apos;s Week 2026, a week-long celebration of vision, excellence, culture, talent, sports, awards, and thanksgiving.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
@@ -90,10 +175,10 @@ export default async function Home() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
 
-      {/* 2. Visual Programme Rail */}
-      <section className="py-32 w-full border-t border-warm-border/50 bg-white/30 relative">
+        {/* 2. Visual Programme Rail */}
+        <section className="py-32 w-full border-t border-warm-border/50 bg-white/30 relative">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div>
@@ -130,10 +215,10 @@ export default async function Home() {
             })}
           </div>
         </div>
-      </section>
+        </section>
 
-      {/* 3. Founder's Week Bento Section */}
-      <section className="py-32 w-full bg-cream-soft relative">
+        {/* 3. Founder's Week Bento Section */}
+        <section className="py-32 w-full bg-cream-soft relative">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-serif text-text-dark tracking-tight mb-4">Five Pillars of Celebration</h2>
@@ -166,10 +251,10 @@ export default async function Home() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
 
-      {/* 4. Grand Finale Split Section */}
-      <section className="py-32 w-full bg-deep-green text-cream relative overflow-hidden">
+        {/* 4. Grand Finale Split Section */}
+        <section className="py-32 w-full bg-deep-green text-cream relative overflow-hidden">
         <div className="absolute top-1/2 left-0 w-[500px] h-[500px] radial-glow-gold rounded-full opacity-20 -translate-y-1/2 -translate-x-1/2 pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -210,10 +295,10 @@ export default async function Home() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
 
-      {/* 5. Voting Preview */}
-      <section className="py-32 w-full relative">
+        {/* 5. Voting Preview */}
+        <section className="py-32 w-full relative">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-serif text-text-dark tracking-tight mb-4">Who takes the crown?</h2>
@@ -258,7 +343,8 @@ export default async function Home() {
             )}
           </div>
         </div>
-      </section>
+        </section>
+      </main>
 
       <Footer />
     </div>

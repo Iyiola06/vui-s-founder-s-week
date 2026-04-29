@@ -1,8 +1,29 @@
+import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import { LogOut } from 'lucide-react';
 import { cookies } from 'next/headers';
 import { ADMIN_SESSION_COOKIE, isValidAdminSession } from '@/lib/admin-auth';
+import { siteConfig } from '@/lib/seo';
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Admin',
+    template: `%s | Admin | ${siteConfig.name}`,
+  },
+  robots: {
+    index: false,
+    follow: false,
+    noarchive: true,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+      nosnippet: true,
+    },
+  },
+};
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();

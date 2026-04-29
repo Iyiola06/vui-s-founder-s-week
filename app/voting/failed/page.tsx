@@ -1,7 +1,16 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import { AlertCircle } from 'lucide-react';
+import { createMetadata } from '@/lib/seo';
+
+export const metadata: Metadata = createMetadata({
+  title: 'Payment Not Completed',
+  description: "Founder's Week payment status page for incomplete voting transactions.",
+  path: '/voting/failed',
+  noIndex: true,
+});
 
 export default function FailedPage() {
   return (
