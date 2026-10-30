@@ -18,31 +18,46 @@ export default function Icon() {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          background: 'linear-gradient(135deg, #0F5132 0%, #143D2E 100%)',
-          color: '#FDFCF8',
-          border: '20px solid #E5C76B',
+          background: 'linear-gradient(135deg, #101828 0%, #172554 100%)',
+          color: '#FAFAF7',
+          border: '18px solid #D9AE52',
+          borderRadius: 80,
         }}
       >
         <div
           style={{
-            fontSize: 176,
-            fontWeight: 700,
+            fontSize: 148,
+            fontWeight: 800,
             lineHeight: 1,
-            fontFamily: 'Georgia, serif',
+            fontFamily: 'serif',
+            color: '#D9AE52',
+            letterSpacing: 4,
           }}
         >
-          VU
+          SPRF
         </div>
         <div
           style={{
-            marginTop: 18,
-            fontSize: 42,
-            letterSpacing: 8,
+            marginTop: 16,
+            fontSize: 28,
+            fontWeight: 600,
+            letterSpacing: 4,
             textTransform: 'uppercase',
-            color: '#E5C76B',
+            color: '#FFFFFF',
           }}
         >
-          FW 2026
+          Venite University
+        </div>
+        <div
+          style={{
+            marginTop: 8,
+            fontSize: 20,
+            letterSpacing: 6,
+            textTransform: 'uppercase',
+            color: '#D9AE52',
+          }}
+        >
+          Students • Voice • Progress
         </div>
       </div>
     ),

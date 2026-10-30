@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { siteConfig } from '@/lib/config';
 import { MapPin, Mail, Phone, ShieldCheck, Compass, Code, ArrowUpRight } from 'lucide-react';
 
@@ -11,15 +12,24 @@ export function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-sprf-deep-navy border border-sprf-gold/30 flex items-center justify-center text-sprf-gold font-serif font-bold text-lg">
-                S
+              <div className="relative w-12 h-12 rounded-xl bg-white p-1 border border-sprf-gold/40 shadow-sm shrink-0 overflow-hidden">
+                <Image
+                  src={siteConfig.images.logo}
+                  alt="SPRF Logo - Student Program Representatives Forum"
+                  fill
+                  sizes="48px"
+                  className="object-contain p-0.5"
+                />
               </div>
               <div>
                 <span className="font-serif font-bold text-xl text-white block leading-tight">
                   SPRF
                 </span>
-                <span className="text-xs text-sprf-gold font-medium">
-                  Student Programmer Representative Forum
+                <span className="text-xs text-sprf-gold font-medium block">
+                  Student Program Representatives Forum
+                </span>
+                <span className="text-[10px] text-white/60 tracking-wider uppercase font-semibold">
+                  Students • Voice • Progress
                 </span>
               </div>
             </div>

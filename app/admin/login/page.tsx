@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { siteConfig } from '@/lib/config';
 import { LoginForm } from './LoginForm';
 import { Shield, ArrowLeft } from 'lucide-react';
 
@@ -12,8 +13,19 @@ export default function AdminLoginPage() {
             <ArrowLeft className="w-4 h-4" />
             <span>Return to Public Portal</span>
           </Link>
-          <div className="w-8 h-8 rounded-lg bg-sprf-navy text-sprf-gold flex items-center justify-center font-bold text-sm">
-            S
+          <div className="flex items-center gap-2">
+            <div className="relative w-9 h-9 rounded-lg bg-white p-1 border border-sprf-gold/40 shadow-xs overflow-hidden">
+              <Image
+                src={siteConfig.images.logo}
+                alt="SPRF Logo"
+                fill
+                sizes="36px"
+                className="object-contain"
+              />
+            </div>
+            <span className="font-serif font-bold text-sm text-sprf-navy hidden sm:inline">
+              SPRF
+            </span>
           </div>
         </div>
 

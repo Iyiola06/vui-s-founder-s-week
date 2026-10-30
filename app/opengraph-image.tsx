@@ -72,20 +72,22 @@ export default async function OpenGraphImage() {
           Venite University, Iloro-Ekiti
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 880 }}>
-          <div style={{ fontSize: 92, lineHeight: 1.02, fontWeight: 700 }}>
-            Founder&apos;s Week 2026
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 900 }}>
+          <div style={{ fontSize: 24, letterSpacing: 4, textTransform: 'uppercase', color: '#D9AE52', fontWeight: 600 }}>
+            Student Program Representatives Forum
+          </div>
+          <div style={{ fontSize: 72, lineHeight: 1.05, fontWeight: 700, color: '#FFFFFF' }}>
+            Orientation & Student Arrival Portal
           </div>
           <div
             style={{
-              fontSize: 34,
-              lineHeight: 1.35,
+              fontSize: 28,
+              lineHeight: 1.4,
               fontFamily: 'Arial, sans-serif',
-              color: 'rgba(253, 252, 248, 0.82)',
+              color: 'rgba(253, 252, 248, 0.85)',
             }}
           >
-            Official programme, dinner and awards details, and secure student
-            voting for the Venite University community.
+            Interactive Journey Planner • Verified Schedules • Freshers&apos; Packing Checklist • Venite University, Iloro-Ekiti
           </div>
         </div>
 
@@ -95,11 +97,11 @@ export default async function OpenGraphImage() {
             justifyContent: 'space-between',
             alignItems: 'center',
             fontFamily: 'Arial, sans-serif',
-            fontSize: 26,
+            fontSize: 24,
             color: 'rgba(253, 252, 248, 0.8)',
           }}
         >
-          <div>{eventDateRange}</div>
+          <div style={{ color: '#D9AE52', fontWeight: 600 }}>Students • Voice • Progress</div>
           <div>{siteConfig.baseUrl.replace(/^https?:\/\//, '')}</div>
         </div>
       </div>

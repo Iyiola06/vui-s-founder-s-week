@@ -48,15 +48,27 @@ export function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-8">
-          {/* Zone 1: Brand Wordmark */}
+          {/* Zone 1: Brand Wordmark & Official Emblem */}
           <Link href="/" className="flex items-center gap-3 shrink-0 group">
-            <div className="w-10 h-10 rounded-xl bg-sprf-navy flex items-center justify-center text-sprf-gold font-serif font-bold text-lg shadow-sm border border-sprf-gold/30">
-              S
+            <div className="relative w-11 h-11 rounded-xl bg-white flex items-center justify-center p-1 shadow-sm border border-sprf-gold/40 group-hover:border-sprf-gold transition-colors overflow-hidden shrink-0">
+              <Image
+                src={siteConfig.images.logo}
+                alt="SPRF Logo - Student Program Representatives Forum"
+                fill
+                sizes="44px"
+                className="object-contain p-0.5"
+                priority
+              />
             </div>
             <div className="flex flex-col">
-              <span className="font-serif font-bold text-lg text-sprf-navy tracking-tight group-hover:text-sprf-gold transition-colors leading-tight">
-                SPRF
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-serif font-bold text-lg text-sprf-navy tracking-tight group-hover:text-sprf-gold transition-colors leading-tight">
+                  SPRF
+                </span>
+                <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded bg-sprf-gold/15 text-sprf-navy border border-sprf-gold/30">
+                  Official
+                </span>
+              </div>
               <span className="text-[10px] uppercase font-bold tracking-widest text-sprf-muted hidden sm:inline">
                 Venite University
               </span>
@@ -115,6 +127,26 @@ export function Navbar() {
             className="bg-white border-b border-sprf-border shadow-xl px-6 py-6 max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
+            <div className="flex items-center gap-3 pb-5 mb-5 border-b border-sprf-border">
+              <div className="relative w-12 h-12 rounded-xl bg-white p-1 shadow-xs border border-sprf-gold/30 shrink-0">
+                <Image
+                  src={siteConfig.images.logo}
+                  alt="SPRF Logo"
+                  fill
+                  sizes="48px"
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-serif font-bold text-base text-sprf-navy leading-tight">
+                  SPRF Venite University
+                </span>
+                <span className="text-[10px] text-sprf-gold font-bold uppercase tracking-wider">
+                  Students • Voice • Progress
+                </span>
+              </div>
+            </div>
+
             <div className="flex flex-col gap-1 pb-6 border-b border-sprf-border">
               <span className="text-[11px] uppercase tracking-wider font-bold text-sprf-muted mb-2">
                 Navigation

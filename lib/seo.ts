@@ -33,15 +33,16 @@ const baseUrl = normalizeBaseUrl(
 );
 
 export const siteConfig = {
-  name: 'SPRF | Student Programmer Representative Forum, Venite University',
+  name: 'SPRF | Student Program Representatives Forum, Venite University',
   shortName: 'SPRF Venite',
   description:
-    'Your official guide to SPRF orientation, student arrival, campus directions, announcements, and essential information for Venite University, Iloro-Ekiti.',
+    'The official platform of the Student Program Representatives Forum, Venite University. Discover our leadership, student representation, welfare initiatives, orientation programmes and student community activities.',
   baseUrl,
   locale: 'en_NG',
+  logoPath: '/sprf-logo.png',
   ogImagePath: '/opengraph-image',
   organizer: {
-    name: 'SPRF — Student Programmer Representative Forum',
+    name: 'SPRF — Student Program Representatives Forum',
     institution: 'Venite University',
     url: baseUrl,
   },
@@ -53,20 +54,22 @@ export const siteConfig = {
     addressCountry: 'NG',
   },
   eventWindow: {
+    resumptionDate: '2026-11-14T08:00:00+01:00',
     startDate: '2026-11-16T08:00:00+01:00',
     endDate: '2026-11-21T18:00:00+01:00',
     dinnerDate: '2026-11-21T18:00:00+01:00',
   },
   keywords: [
     'SPRF Venite University',
-    'Student Programmer Representative Forum',
+    'Student Program Representatives Forum',
+    'Venite University student leadership',
+    'Venite University student welfare',
+    'student representation Venite',
     'Venite University orientation 2026',
     'Venite University freshers arrival',
     'Iloro-Ekiti campus directions',
     'student arrival guide Nigeria',
-    'Venite University timetable',
     'Venite University student portal',
-    'SPRF coding community',
     'Ekiti state university orientation',
   ],
 } as const;

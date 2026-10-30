@@ -291,38 +291,38 @@ export const defaultOrientationDays: OrientationDayItem[] = [
   },
   {
     id: 'day-5',
-    title: 'Day 5: SPRF Tech Exhibition & Innovation Showcase',
-    slug: 'day-5-sprf-tech-exhibition',
+    title: 'Day 5: SPRF Student Forum & University Community Exhibition',
+    slug: 'day-5-sprf-student-forum',
     eventDate: '2026-11-20T10:00:00+01:00',
-    description: 'Student programmer showcase, hackathon announcements, lightning tech talks, and open-source project demos.',
-    venue: 'Venite University Innovation Hall',
+    description: 'University-wide student leadership forum, academic societies exhibition, talent showcase, and interactive student welfare town hall.',
+    venue: 'Venite University Central Auditorium',
     status: 'published',
     displayOrder: 5,
     activities: [
       {
         id: 'act-5-1',
         orientationDayId: 'day-5',
-        title: 'SPRF Student Projects Exhibition & Live Code Demos',
-        description: 'Showcase of practical software solutions built by Venite University student programmers.',
+        title: 'SPRF University-Wide Student Town Hall & Welfare Dialogue',
+        description: 'An open dialogue between student representatives, faculty coordinators, and freshers on student experience, academic expectations, and community building.',
         startTime: '10:00 AM',
         endTime: '01:00 PM',
-        venue: 'Innovation Hall',
-        category: 'Tech',
-        speaker: 'SPRF Engineering Leads',
-        isCompulsory: false,
+        venue: 'University Central Auditorium',
+        category: 'Forum',
+        speaker: 'SPRF Executive Council',
+        isCompulsory: true,
         displayOrder: 1,
         status: 'published',
       },
       {
         id: 'act-5-2',
         orientationDayId: 'day-5',
-        title: 'Tech Career Pathways: From 100L to Industry Readiness',
-        description: 'Interactive fireside chat with alumni engineers and tech industry leaders on software careers.',
+        title: 'Inter-Faculty Societies & Student Leadership Fair',
+        description: 'Interactive exhibition of registered academic societies across Health Sciences, Law, Computing, Management, and Agriculture.',
         startTime: '02:00 PM',
         endTime: '04:30 PM',
-        venue: 'Innovation Hall',
+        venue: 'University Central Auditorium & Foyer',
         category: 'Academic',
-        speaker: 'SPRF President & Guest Engineers',
+        speaker: 'Faculty & Programme Representatives',
         isCompulsory: false,
         displayOrder: 2,
         status: 'published',
@@ -408,13 +408,15 @@ For immediate arrival assistance or questions about motor park drop-offs, call t
   },
   {
     id: 'ann-3',
-    title: 'Hostel Room Keys & Bedding Allocation Schedule',
+    title: 'Resumption Day: Hostel Room Keys & Bedding Allocation Schedule',
     slug: 'hostel-room-keys-allocation-schedule',
-    summary: 'Hostels open from 8:00 AM on Monday. Please confirm your hostel fee verification before heading to the hall warden office.',
-    content: `Hostel accommodation desks in the University Residence Halls will commence room key issuance starting 8:00 AM on Monday, November 16, 2026.
+    summary: 'Hostel check-in opens at 8:00 AM on Saturday, November 14 (Official Resumption Day). Please confirm your accommodation receipt before arriving at the warden desk.',
+    content: `Hostel accommodation desks across all University Residence Halls will commence room key issuance starting 8:00 AM on Saturday, November 14, 2026 (Official Resumption Day).
 
-Important Reminders:
-- Students must present their validated accommodation receipt.
+Important Reminders for Arriving Students:
+- Resumption begins on Saturday, November 14, 2026. Students are encouraged to arrive during daylight hours (before 5:00 PM).
+- Orientation Week officially commences on Monday, November 16, 2026.
+- Students must present their validated accommodation receipt and admission clearance slip at the hall warden desk.
 - Standard university mattresses are provided; students are required to bring bedsheets, pillowcases, and personal blankets.
 - Electrical appliances exceeding 500W (e.g. hotplates, boiling rings) are strictly prohibited in the halls of residence as per university fire safety codes.`,
     category: 'Accommodation',
@@ -424,16 +426,16 @@ Important Reminders:
   },
   {
     id: 'ann-4',
-    title: 'SPRF Technology Orientation & Peer Mentorship Track Registration',
-    slug: 'sprf-technology-orientation-peer-mentorship',
-    summary: 'Join peer coding cohorts, receive free software development tooling kits, and participate in our 100L programmer accelerator.',
-    content: `The Student Programmer Representative Forum invites all newly admitted students in Computing, Software Engineering, Cybersecurity, and tech-curious departments to our orientation sessions on Day 3 and Day 5.
+    title: 'SPRF Student Mentorship & Academic Programme Orientation Registration',
+    slug: 'sprf-student-mentorship-academic-programme-orientation',
+    summary: 'Connect with designated programme representatives, receive academic study guides, and learn about university-wide student welfare initiatives.',
+    content: `The Student Program Representatives Forum invites all newly admitted students across all faculties and academic programmes to participate in our orientation mentorship sessions.
 
-Participants will receive:
-- Free GitHub Student Developer Pack activation guidance
-- Introduction to campus coding hubs and hackathons
-- Peer mentorship pairings with senior engineering students
-- Hands-on workshops in Web Development, Mobile Apps, and Artificial Intelligence.`,
+Key Highlights for Freshers:
+- Introduction to your designated Faculty and Departmental Programme Representatives
+- Academic study guidance, course registration walkthroughs, and library access orientation
+- Student welfare briefings, healthcare access at the university clinic, and counseling support
+- Interactive Q&A on navigating campus life, student associations, and leadership participation.`,
     category: 'Orientation',
     priority: 'normal',
     status: 'published',
@@ -477,8 +479,8 @@ export const defaultFaqs: FaqItem[] = [
   {
     id: 'faq-5',
     question: 'What is SPRF and how does it support students?',
-    answer: 'SPRF stands for Student Programmer Representative Forum. It is the premier student-led technological leadership forum at Venite University. SPRF represents student interests in digital learning, hosts coding workshops, provides peer mentorship, organizes hackathons, and manages technology platforms that enhance student campus life.',
-    category: 'SPRF & Tech',
+    answer: 'SPRF stands for Student Program Representatives Forum. It is the university-wide student representative and leadership body of Venite University, established to serve as a collective voice for all students, represent their interests, promote student welfare, facilitate communication between students and university management, and foster an inclusive, united, and vibrant university community across all academic disciplines.',
+    category: 'SPRF Representation',
     displayOrder: 5,
     status: 'published',
   },
@@ -495,20 +497,20 @@ export const defaultFaqs: FaqItem[] = [
 export const defaultLeadership: LeadershipItem[] = [
   {
     id: 'lead-1',
-    name: 'President, SPRF',
-    role: 'Executive President & Student Programmer Representative',
-    biography: 'Leads SPRF executive administration, student representation with university governance, digital student welfare initiatives, and student technical capacity development at Venite University.',
-    imagePath: '/images/hero_sprf_students_1793296260047.jpg',
+    name: 'President',
+    role: 'Executive President, SPRF',
+    biography: 'Leads the SPRF Executive Council in general student advocacy, inter-faculty representation, student welfare policy, and constructive engagement with Venite University governance.',
+    imagePath: '/images/venite/academic_gowns.jpg',
     contactUrl: 'mailto:president@sprf-venite.org',
     displayOrder: 1,
     status: 'published',
   },
   {
     id: 'lead-2',
-    name: 'Vice President (Administration)',
-    role: 'Vice President & Orientation Operations Lead',
-    biography: 'Directs orientation week logistics, fresher onboarding programs, inter-faculty student coordination, and welfare marshals.',
-    imagePath: '/images/tech_code_workshop_1793296261772.jpg',
+    name: 'Vice President',
+    role: 'Vice President, SPRF',
+    biography: 'Coordinates internal representative affairs, academic programme liaison across all faculties, and oversees committee operations for university-wide student integration.',
+    imagePath: '/images/venite/matriculating_students.jpg',
     contactUrl: 'mailto:vp@sprf-venite.org',
     displayOrder: 2,
     status: 'published',
@@ -516,28 +518,64 @@ export const defaultLeadership: LeadershipItem[] = [
   {
     id: 'lead-3',
     name: 'General Secretary',
-    role: 'General Secretary & Records Director',
-    biography: 'Oversees official communications, meeting archives, fresher inquiries documentation, and liaison with the Directorate of Student Affairs.',
+    role: 'General Secretary, SPRF',
+    biography: 'Directs official records, executive communications, meeting documentation, student circulars, and administrative liaison with the Directorate of Student Affairs.',
     contactUrl: 'mailto:secretary@sprf-venite.org',
     displayOrder: 3,
     status: 'published',
   },
   {
     id: 'lead-4',
-    name: 'Director of Technology & Systems',
-    role: 'Chief Technology Officer',
-    biography: 'Leads development of student software platforms, portal tech support, campus coding bootcamps, and developer track mentorship.',
-    contactUrl: 'mailto:tech@sprf-venite.org',
+    name: 'Assistant General Secretary',
+    role: 'Assistant General Secretary, SPRF',
+    biography: 'Assists in managing secretariat operations, student feedback registries, and coordination between departmental programme representatives.',
+    contactUrl: 'mailto:asst-secretary@sprf-venite.org',
     displayOrder: 4,
     status: 'published',
   },
   {
     id: 'lead-5',
-    name: 'Director of Student Welfare & Logistics',
-    role: 'Welfare & Arrival Logistics Lead',
-    biography: 'Coordinates arrival travel assistance, hostel welfare oversight, food vendor hygiene verification, and student emergency response.',
-    contactUrl: 'mailto:welfare@sprf-venite.org',
+    name: 'Financial Secretary',
+    role: 'Financial Secretary, SPRF',
+    biography: 'Maintains financial accountability, budget planning for student initiatives, and fiscal transparency across all forum activities.',
+    contactUrl: 'mailto:finance@sprf-venite.org',
     displayOrder: 5,
+    status: 'published',
+  },
+  {
+    id: 'lead-6',
+    name: 'Treasurer',
+    role: 'Treasurer, SPRF',
+    biography: 'Manages statutory disbursements, student welfare funds, and ensures prudent custody of forum resources in line with student constitutional standards.',
+    contactUrl: 'mailto:treasurer@sprf-venite.org',
+    displayOrder: 6,
+    status: 'published',
+  },
+  {
+    id: 'lead-7',
+    name: 'Public Relations Officer',
+    role: 'Public Relations Officer (PRO), SPRF',
+    biography: 'Heads university-wide student communications, official bulletin releases, student social media channels, and orientation information campaigns.',
+    contactUrl: 'mailto:pro@sprf-venite.org',
+    displayOrder: 7,
+    status: 'published',
+  },
+  {
+    id: 'lead-8',
+    name: 'Welfare Director',
+    role: 'Welfare Director, SPRF',
+    biography: 'Oversees student living conditions, hostel accommodation liaison, arrival transport assistance, cafeteria oversight, and health centre welfare coordination.',
+    contactUrl: 'mailto:welfare@sprf-venite.org',
+    displayOrder: 8,
+    status: 'published',
+  },
+  {
+    id: 'lead-9',
+    name: 'Social Director',
+    role: 'Social Director, SPRF',
+    biography: 'Plans inclusive campus cultural expressions, inter-faculty sports mixers, community-building gatherings, and student recreational events.',
+    contactUrl: 'mailto:social@sprf-venite.org',
+    displayOrder: 9,
     status: 'published',
   },
 ];
