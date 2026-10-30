@@ -200,7 +200,7 @@ export default async function HomePage() {
                 Getting to Venite should be the easy part.
               </h2>
               <p className="text-sm text-sprf-muted mt-3 leading-relaxed font-light">
-                Whether travelling from Lagos, Ibadan, Akure, Abuja, or across Nigeria, enter your departure location below to open turn-by-turn directions in Google Maps.
+                Whether travelling from Lagos, Ibadan, Akure, Abuja, or across Nigeria, explore our interactive campus map and interstate routes directly on-page, or launch guaranteed turn-by-turn GPS navigation in Google Maps, Apple Maps, or Waze.
               </p>
             </div>
 

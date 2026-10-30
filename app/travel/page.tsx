@@ -45,7 +45,7 @@ export default function TravelPage() {
               Travelling to <span className="text-sprf-gold italic">Venite University</span>
             </h1>
             <p className="text-base text-sprf-muted leading-relaxed font-light">
-              We are excited to welcome you to our Iloro-Ekiti campus. Enter your starting city, town, or motor park below to generate verified driving or transit directions directly in Google Maps.
+              We are excited to welcome you to our Iloro-Ekiti campus. Explore our interactive on-site campus map, regional highway networks, and key university landmarks below, or launch external GPS navigation in Google Maps, Apple Maps, or Waze.
             </p>
           </div>
 
