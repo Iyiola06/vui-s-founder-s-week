@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
-import { LogOut } from 'lucide-react';
+import { LogOut, Home, Shield } from 'lucide-react';
 import { cookies } from 'next/headers';
 import { ADMIN_SESSION_COOKIE, isValidAdminSession } from '@/lib/admin-auth';
 import { siteConfig } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Admin',
-    template: `%s | Admin | ${siteConfig.name}`,
+    default: 'SPRF Admin',
+    template: `%s | SPRF Admin | ${siteConfig.name}`,
   },
   robots: {
     index: false,
@@ -30,16 +30,26 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const hasSession = await isValidAdminSession(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
 
   return (
-    <div className="min-h-screen bg-[#FDFCF8] text-[#1F211C] font-sans selection:bg-[#C9A227] selection:text-[#1F211C]">
+    <div className="min-h-screen bg-sprf-surface text-sprf-charcoal font-sans selection:bg-sprf-gold/30 selection:text-sprf-navy">
       {hasSession && (
-        <Link
-          href="/admin/logout"
-          className="fixed bottom-6 right-6 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-venite-green/10 bg-white/90 text-venite-green shadow-lg shadow-venite-green/10 backdrop-blur transition-colors hover:bg-venite-green hover:text-cream"
-          title="Sign out"
-          aria-label="Sign out"
-        >
-          <LogOut className="h-5 w-5" />
-        </Link>
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+          <Link
+            href="/"
+            className="inline-flex h-11 px-4 items-center gap-2 rounded-full border border-sprf-border bg-white/95 text-sprf-navy text-xs font-bold shadow-lg shadow-sprf-navy/5 backdrop-blur transition-all hover:bg-sprf-navy hover:text-white"
+            title="View Public Site"
+          >
+            <Home className="h-4 w-4 text-sprf-gold" />
+            <span>Public Site</span>
+          </Link>
+          <Link
+            href="/admin/logout"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-sprf-border bg-white/95 text-sprf-navy shadow-lg shadow-sprf-navy/5 backdrop-blur transition-all hover:bg-red-600 hover:text-white hover:border-red-600"
+            title="Sign out of Admin"
+            aria-label="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </Link>
+        </div>
       )}
       {children}
     </div>

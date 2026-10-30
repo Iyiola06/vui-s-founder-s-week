@@ -1,85 +1,167 @@
 'use client';
 
 import React, { useState } from 'react';
-import { GlassCard } from '@/components/ui/GlassCard';
-import { PrimaryButton } from '@/components/ui/PrimaryButton';
-import { updateSiteSetting } from '../actions';
-import { useRouter } from 'next/navigation';
+import { updateSiteSettings } from '@/app/admin/actions';
+import { Settings, Save, CheckCircle, AlertCircle, Loader2, Compass } from 'lucide-react';
 
-export default function AdminSettingsClient({ initialSettings }: { initialSettings: any }) {
-  const router = useRouter();
-  const [formData, setFormData] = useState({
-    dinnerVenue: initialSettings.dinnerVenue || '',
-    dinnerTime: initialSettings.dinnerTime || '',
-    globalVotingOpen: initialSettings.globalVotingOpen === 'true',
+interface Props {
+  initialSettings: Record<string, string>;
+}
+
+export default function AdminSettingsClient({ initialSettings }: Props) {
+  const [form, setForm] = useState({
+    institution: initialSettings.institution || 'Venite University',
+    address: initialSettings.address || 'KM 2, Ayetoro Road, Iloro-Ekiti, Ekiti State, Nigeria',
+    googleMapsDestination: initialSettings.googleMapsDestination || 'Venite University, KM 2, Ayetoro Road, Iloro-Ekiti, Ekiti State, Nigeria',
+    orientationDatesText: initialSettings.orientationDatesText || 'Monday, November 16 – Saturday, November 21, 2026',
+    officialEmail: initialSettings.officialEmail || 'sprf@venite.edu.ng',
+    emergencyHelpline: initialSettings.emergencyHelpline || '+234 800 000 7773',
+    sessionName: initialSettings.sessionName || '2026/2027 Academic Session',
   });
-  const [isLoading, setIsLoading] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
+    setMessage(null);
+
     try {
-      await updateSiteSetting('dinnerVenue', formData.dinnerVenue);
-      await updateSiteSetting('dinnerTime', formData.dinnerTime);
-      await updateSiteSetting('globalVotingOpen', formData.globalVotingOpen ? 'true' : 'false');
-      
-      alert('Settings updated successfully!');
-      router.refresh();
-      // Optional force reload
-      setTimeout(() => window.location.reload(), 500);
-    } catch (err) {
-      console.error(err);
-      alert('Failed to update settings.');
+      await updateSiteSettings(form);
+      setMessage({ text: 'Central portal configuration saved successfully!', type: 'success' });
+    } catch (err: any) {
+      setMessage({ text: err.message || 'Failed to save settings.', type: 'error' });
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsLoading(false);
   };
 
   return (
-    <GlassCard className="bg-white/60 p-8 border-venite-green/5">
-      <h2 className="text-xl font-serif mb-8 text-venite-green">Global Settings</h2>
-      
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        <div>
-           <label className="text-[10px] uppercase font-bold text-venite-green/50 tracking-widest block mb-2">Dinner & Awards Venue</label>
-           <input 
-             type="text" 
-             value={formData.dinnerVenue}
-             onChange={e => setFormData({...formData, dinnerVenue: e.target.value})}
-             className="w-full bg-venite-green/5 border border-transparent focus:bg-white focus:border-venite-gold rounded-xl px-4 py-3 text-sm transition-colors outline-none"
-             placeholder="e.g. Venite University Main Auditorium"
-           />
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-xl font-serif text-sprf-navy mb-1">Central Portal Settings</h3>
+        <p className="text-xs text-sprf-muted">
+          Update central university address, verified Google Maps pin query, orientation calendar dates, and official helpline numbers.
+        </p>
+      </div>
 
-        <div>
-           <label className="text-[10px] uppercase font-bold text-venite-green/50 tracking-widest block mb-2">Dinner Time</label>
-           <input 
-             type="text" 
-             value={formData.dinnerTime}
-             onChange={e => setFormData({...formData, dinnerTime: e.target.value})}
-             className="w-full bg-venite-green/5 border border-transparent focus:bg-white focus:border-venite-gold rounded-xl px-4 py-3 text-sm transition-colors outline-none"
-             placeholder="e.g. 7:00 PM"
-           />
+      {message && (
+        <div
+          className={`p-4 rounded-xl text-xs flex items-center gap-2 ${
+            message.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-800 border border-red-200'
+          }`}
+        >
+          {message.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+          <span>{message.text}</span>
         </div>
+      )}
 
-        <div className="pt-4 border-t border-venite-green/10">
-          <label className="flex items-center gap-3 cursor-pointer bg-venite-green/5 p-4 rounded-xl border border-transparent hover:border-venite-gold transition-colors">
-            <input 
-              type="checkbox" 
-              checked={formData.globalVotingOpen}
-              onChange={e => setFormData({...formData, globalVotingOpen: e.target.checked})}
-              className="w-4 h-4 rounded text-venite-green focus:ring-venite-gold border-venite-green/20"
-            />
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-venite-green">Global Voting Master Switch</span>
-              <span className="text-xs text-venite-green/60">If off, voting is disabled globally regardless of category settings.</span>
+      <form onSubmit={handleSubmit} className="sprf-card rounded-2xl p-6 sm:p-8 bg-white space-y-6 max-w-2xl">
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-bold uppercase tracking-wider text-sprf-charcoal block mb-1">
+              Google Maps Destination String (Signature Feature) *
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                required
+                value={form.googleMapsDestination}
+                onChange={(e) => setForm({ ...form, googleMapsDestination: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-sprf-surface border border-sprf-border text-sm font-mono text-sprf-navy"
+              />
             </div>
-          </label>
+            <p className="text-[11px] text-sprf-muted mt-1">
+              This exact text is URL-encoded when users click &quot;Get Directions&quot; on the public Journey Planner.
+            </p>
+          </div>
+
+          <div>
+            <label className="text-xs font-bold uppercase tracking-wider text-sprf-charcoal block mb-1">
+              Campus Physical Address *
+            </label>
+            <input
+              type="text"
+              required
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl bg-sprf-surface border border-sprf-border text-sm"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-sprf-charcoal block mb-1">
+                Orientation Window Label *
+              </label>
+              <input
+                type="text"
+                required
+                value={form.orientationDatesText}
+                onChange={(e) => setForm({ ...form, orientationDatesText: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-sprf-surface border border-sprf-border text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-sprf-charcoal block mb-1">
+                Current Academic Session *
+              </label>
+              <input
+                type="text"
+                required
+                value={form.sessionName}
+                onChange={(e) => setForm({ ...form, sessionName: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-sprf-surface border border-sprf-border text-sm font-mono"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-sprf-charcoal block mb-1">
+                Official Helpdesk Email *
+              </label>
+              <input
+                type="email"
+                required
+                value={form.officialEmail}
+                onChange={(e) => setForm({ ...form, officialEmail: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-sprf-surface border border-sprf-border text-sm font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-sprf-charcoal block mb-1">
+                Arrival 24/7 Emergency Helpline *
+              </label>
+              <input
+                type="text"
+                required
+                value={form.emergencyHelpline}
+                onChange={(e) => setForm({ ...form, emergencyHelpline: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-sprf-surface border border-sprf-border text-sm font-mono"
+              />
+            </div>
+          </div>
         </div>
 
-        <PrimaryButton type="submit" disabled={isLoading} className="w-full mt-4">
-          {isLoading ? 'Saving...' : 'Save Settings'}
-        </PrimaryButton>
+        <div className="pt-4 border-t border-sprf-border flex justify-end">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-6 py-3 rounded-xl bg-sprf-navy text-white text-xs font-bold uppercase tracking-wider hover:bg-sprf-blue flex items-center gap-2 shadow-sm"
+          >
+            {isSubmitting ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-sprf-gold" />
+            ) : (
+              <Save className="w-3.5 h-3.5 text-sprf-gold" />
+            )}
+            <span>Save Settings</span>
+          </button>
+        </div>
       </form>
-    </GlassCard>
+    </div>
   );
 }

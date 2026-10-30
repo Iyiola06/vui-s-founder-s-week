@@ -9,51 +9,113 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model EventDay {
+model OrientationDay {
+  id           String                @id @default(cuid())
+  title        String
+  slug         String                @unique
+  eventDate    DateTime
+  description  String?
+  venue        String?
+  status       String                @default("published") // published, draft
+  displayOrder Int                   @default(0)
+  activities   OrientationActivity[]
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+}
+
+model OrientationActivity {
+  id               String          @id @default(cuid())
+  orientationDayId String
+  orientationDay   OrientationDay  @relation(fields: [orientationDayId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?
+  startTime        String          // e.g. "09:00 AM"
+  endTime          String?         // e.g. "11:30 AM"
+  venue            String
+  category         String          // Academic, Induction, Social, Tech, Tour, Welfare
+  speaker          String?
+  isCompulsory     Boolean         @default(false)
+  displayOrder     Int             @default(0)
+  status           String          @default("published")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  summary     String
+  content     String
+  category    String    // Orientation, Registration, Travel, Accommodation, General
+  priority    String    @default("normal") // normal, urgent
+  status      String    @default("published") // published, draft
+  publishedAt DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Faq {
+  id           String   @id @default(cuid())
+  question     String
+  answer       String
+  category     String   // Admissions, Arrival & Travel, Accommodation, Orientation, SPRF & Tech
+  displayOrder Int      @default(0)
+  status       String   @default("published")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Resource {
   id          String   @id @default(cuid())
-  date        DateTime
   title       String
   description String?
+  filePath    String
+  fileType    String   // PDF, Guide, Checklist, Map
+  category    String   // Admission, Academic, Campus
+  status      String   @default("published")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-model VotingCategory {
-  id           String      @id @default(cuid())
+model LeadershipProfile {
+  id           String   @id @default(cuid())
   name         String
-  description  String?
-  pricePerVote Float       @default(500) // Price in NGN
-  isOpen       Boolean     @default(false)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  candidates   Candidate[]
+  role         String
+  biography    String
+  imagePath    String?
+  contactUrl   String?
+  displayOrder Int      @default(0)
+  status       String   @default("published")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
-model Candidate {
-  id           String         @id @default(cuid())
-  name         String
-  department   String?
-  level        String?
-  imageUrl     String?
-  voteCount    Int            @default(0)
-  categoryId   String
-  category     VotingCategory @relation(fields: [categoryId], references: [id])
-  transactions VoteTransaction[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+model TransportGuide {
+  id                String    @id @default(cuid())
+  originCity        String
+  destination       String    @default("Venite University, Iloro-Ekiti")
+  providerName      String
+  terminalName      String
+  routeDescription  String
+  estimatedFare     String?
+  currency          String    @default("NGN")
+  estimatedDuration String?
+  sourceUrl         String?
+  lastVerifiedAt    DateTime?
+  status            String    @default("published")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
-model VoteTransaction {
-  id           String    @id @default(cuid())
-  reference    String    @unique // Paystack transaction reference
-  amount       Float
-  voteQuantity Int       @default(1)
-  status       String    // pending, success, failed, abandoned
-  email        String
-  candidateId  String
-  candidate    Candidate @relation(fields: [candidateId], references: [id])
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  category  String
+  message   String
+  status    String   @default("unread") // unread, read, replied
+  createdAt DateTime @default(now())
 }
 
 model SiteSetting {
@@ -70,4 +132,52 @@ model AdminUser {
   password  String   // Hashed password
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Preserve existing models for backwards compatibility
+model EventDay {
+  id          String   @id @default(cuid())
+  date        DateTime
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model VotingCategory {
+  id           String      @id @default(cuid())
+  name         String
+  description  String?
+  pricePerVote Float       @default(500)
+  isOpen       Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  candidates   Candidate[]
+}
+
+model Candidate {
+  id           String            @id @default(cuid())
+  name         String
+  department   String?
+  level        String?
+  imageUrl     String?
+  voteCount    Int               @default(0)
+  categoryId   String
+  category     VotingCategory    @relation(fields: [categoryId], references: [id])
+  transactions VoteTransaction[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model VoteTransaction {
+  id           String    @id @default(cuid())
+  reference    String    @unique
+  amount       Float
+  voteQuantity Int       @default(1)
+  status       String
+  email        String
+  candidateId  String
+  candidate    Candidate @relation(fields: [candidateId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

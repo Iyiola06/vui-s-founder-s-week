@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
-import { NoiseOverlay } from '@/components/ui/NoiseOverlay';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { absoluteUrl, siteConfig } from '@/lib/seo';
 import './globals.css';
@@ -30,7 +29,7 @@ export const metadata: Metadata = {
   creator: siteConfig.organizer.name,
   publisher: siteConfig.organizer.name,
   keywords: [...siteConfig.keywords],
-  category: 'event',
+  category: 'education',
   referrer: 'origin-when-cross-origin',
   formatDetection: {
     telephone: false,
@@ -81,22 +80,27 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0F5132',
+  themeColor: '#101828',
 };
 
-export default function RootLayout({children}: {children: React.ReactNode}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const organizationJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'CollegeOrUniversity',
-    name: siteConfig.organizer.name,
-    url: siteConfig.organizer.url,
-    logo: absoluteUrl('/venite-logo.png'),
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: siteConfig.venue.addressLocality,
-      addressRegion: siteConfig.venue.addressRegion,
-      addressCountry: siteConfig.venue.addressCountry,
+    '@type': 'EducationalOrganization',
+    name: 'Student Programmer Representative Forum (SPRF)',
+    parentOrganization: {
+      '@type': 'CollegeOrUniversity',
+      name: 'Venite University',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'KM 2, Ayetoro Road',
+        addressLocality: 'Iloro-Ekiti',
+        addressRegion: 'Ekiti State',
+        addressCountry: 'NG',
+      },
     },
+    url: siteConfig.baseUrl,
+    logo: absoluteUrl('/venite-logo.png'),
   };
 
   const websiteJsonLd = {
@@ -105,17 +109,12 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     name: siteConfig.name,
     url: siteConfig.baseUrl,
     description: siteConfig.description,
-    publisher: {
-      '@type': 'CollegeOrUniversity',
-      name: siteConfig.organizer.name,
-    },
   };
 
   return (
     <html lang="en-NG" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="min-h-screen flex flex-col font-sans bg-cream text-text-dark" suppressHydrationWarning>
+      <body className="min-h-screen flex flex-col font-sans bg-sprf-surface text-sprf-charcoal selection:bg-sprf-gold/30 selection:text-sprf-navy" suppressHydrationWarning>
         <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
-        <NoiseOverlay />
         {children}
       </body>
     </html>

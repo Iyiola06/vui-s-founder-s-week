@@ -1,233 +1,321 @@
-import { prisma } from '@/lib/prisma';
-import { logDatabaseIssue } from '@/lib/db';
 import Link from 'next/link';
-import { GlassCard } from '@/components/ui/GlassCard';
-import { SectionHeader } from '@/components/ui/SectionHeader';
-import { PrimaryButton } from '@/components/ui/PrimaryButton';
-import { ArrowLeft, Users, CheckCircle2, Ticket, Settings } from 'lucide-react';
+import {
+  getOrientationDays,
+  getAnnouncements,
+  getFaqs,
+  getLeadershipProfiles,
+  getTransportGuides,
+  getContactMessages,
+  getSiteSettings,
+} from '@/lib/data-store';
+import { siteConfig } from '@/lib/config';
+import {
+  Calendar,
+  Bell,
+  HelpCircle,
+  Users,
+  Bus,
+  MessageSquare,
+  Settings,
+  ArrowRight,
+  Shield,
+  Compass,
+  CheckCircle,
+  Clock,
+  MapPin,
+  Phone,
+  Mail,
+  ExternalLink,
+} from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  let stats = {
-    totalRevenue: 0,
-    totalVotes: 0,
-    transactions: 0,
-    candidates: 0,
-    categories: 0,
-  };
+  const [
+    days,
+    announcements,
+    faqs,
+    leadership,
+    transports,
+    messages,
+    settings,
+  ] = await Promise.all([
+    getOrientationDays(),
+    getAnnouncements(),
+    getFaqs(),
+    getLeadershipProfiles(),
+    getTransportGuides(),
+    getContactMessages(),
+    getSiteSettings(),
+  ]);
 
-  let recentTransactions: any[] = [];
-  let categories: any[] = [];
-  let isDbConnected = true;
-
-  try {
-    const transactions = await prisma.voteTransaction.findMany({
-      orderBy: { createdAt: 'desc' },
-      include: { candidate: { include: { category: true } } },
-      take: 20,
-    });
-
-    categories = await prisma.votingCategory.findMany({
-      include: {
-        _count: { select: { candidates: true } },
-        candidates: {
-          orderBy: { voteCount: 'desc' },
-        }
-      },
-      orderBy: { name: 'asc' },
-    });
-
-    const successTransactions = await prisma.voteTransaction.findMany({
-      where: { status: 'success' },
-    });
-
-    stats.transactions = await prisma.voteTransaction.count();
-    stats.totalRevenue = successTransactions.reduce((acc, curr) => acc + curr.amount, 0);
-    stats.totalVotes = successTransactions.reduce((acc, curr) => acc + curr.voteQuantity, 0);
-    stats.categories = categories.length;
-    stats.candidates = categories.reduce((acc, curr) => acc + curr.candidates.length, 0);
-    
-    recentTransactions = transactions;
-  } catch (error) {
-    logDatabaseIssue('admin dashboard data', error);
-    isDbConnected = false;
-  }
+  const totalActivities = days.reduce((sum, d) => sum + (d.activities || []).length, 0);
+  const urgentAnnouncements = announcements.filter((a) => a.priority === 'urgent').length;
+  const unreadMessages = messages.filter((m) => m.status === 'unread').length;
 
   return (
-    <div className="w-full mx-auto min-h-screen bg-cream text-venite-green font-sans overflow-x-hidden">
-      <nav className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center relative z-20">
-        <Link href="/" className="inline-flex items-center text-sm font-bold uppercase tracking-widest text-venite-green hover:text-venite-gold transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Site
-        </Link>
-        <div className="text-xl font-serif font-medium tracking-tight">
-          Admin <span className="italic text-venite-gold">Dashboard</span>
-        </div>
-      </nav>
-
-      <section className="px-6 py-6 max-w-7xl mx-auto">
-        {!isDbConnected && (
-          <div className="bg-red-50 text-red-800 px-6 py-4 rounded-2xl text-sm font-medium mb-8">
-            Database connection failed. Please configure DATABASE_URL.
+    <div className="w-full min-h-screen bg-sprf-surface text-sprf-charcoal pb-24">
+      {/* Top Navigation */}
+      <header className="bg-white border-b border-sprf-border sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-sprf-navy text-sprf-gold flex items-center justify-center font-bold text-sm">
+              S
+            </div>
+            <div>
+              <span className="font-serif font-bold text-lg text-sprf-navy block leading-tight">
+                SPRF Executive Console
+              </span>
+              <span className="text-[10px] uppercase font-bold tracking-wider text-sprf-muted">
+                Venite University Student Portal
+              </span>
+            </div>
           </div>
-        )}
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Link href="/admin/payments">
-            <GlassCard className="bg-white/60 p-6 flex items-center gap-4 border-venite-green/5 hover:border-venite-gold/50 hover:bg-white/80 transition-all cursor-pointer h-full">
-              <div className="w-12 h-12 bg-venite-green/10 text-venite-green rounded-full flex items-center justify-center shrink-0">
-                <span className="font-serif text-xl border">NGN</span>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="px-4 py-2 rounded-lg border border-sprf-border text-xs font-semibold text-sprf-charcoal hover:bg-sprf-surface transition-colors flex items-center gap-1.5"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-sprf-muted" />
+              <span>View Public Portal</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Dashboard Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-10">
+        {/* Welcome Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-sprf-gold uppercase tracking-wider mb-1">
+              <Shield className="w-3.5 h-3.5" />
+              <span>SPRF Presidential & Executive Desk</span>
+            </div>
+            <h1 className="text-3xl font-serif text-sprf-navy">Orientation Operations Overview</h1>
+          </div>
+
+          <div className="text-xs text-sprf-muted font-mono bg-white px-3 py-1.5 rounded-lg border border-sprf-border self-start sm:self-auto">
+            Session: {settings.sessionName || siteConfig.sessionName}
+          </div>
+        </div>
+
+        {/* 6 Key Stat Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <Link href="/admin/orientation" className="group">
+            <div className="sprf-card rounded-2xl p-5 bg-white group-hover:border-sprf-gold transition-all h-full">
+              <div className="flex items-center justify-between mb-3">
+                <Calendar className="w-5 h-5 text-sprf-gold" />
+                <span className="text-[10px] uppercase font-bold text-sprf-muted">Days</span>
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold opacity-50">Total Revenue</p>
-                <p className="text-2xl font-serif">NGN {stats.totalRevenue.toLocaleString()}</p>
-              </div>
-            </GlassCard>
-          </Link>
-          
-          <Link href="/admin/payments">
-            <GlassCard className="bg-white/60 p-6 flex items-center gap-4 border-venite-green/5 hover:border-venite-gold/50 hover:bg-white/80 transition-all cursor-pointer h-full">
-              <div className="w-12 h-12 bg-venite-green/10 text-venite-green rounded-full flex items-center justify-center shrink-0">
-                <Ticket className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold opacity-50">Paid Votes</p>
-                <p className="text-2xl font-serif">{stats.totalVotes.toLocaleString()}</p>
-              </div>
-            </GlassCard>
+              <p className="text-2xl font-serif font-bold text-sprf-navy">{days.length}</p>
+              <p className="text-[11px] text-sprf-muted mt-1">{totalActivities} sessions</p>
+            </div>
           </Link>
 
-          <Link href="/admin/categories">
-            <GlassCard className="bg-white/60 p-6 flex items-center gap-4 border-venite-green/5 hover:border-venite-gold/50 hover:bg-white/80 transition-all cursor-pointer h-full">
-              <div className="w-12 h-12 bg-venite-green/10 text-venite-green rounded-full flex items-center justify-center shrink-0">
-                <Settings className="w-5 h-5" />
+          <Link href="/admin/announcements" className="group">
+            <div className="sprf-card rounded-2xl p-5 bg-white group-hover:border-sprf-gold transition-all h-full">
+              <div className="flex items-center justify-between mb-3">
+                <Bell className="w-5 h-5 text-sprf-gold" />
+                <span className="text-[10px] uppercase font-bold text-sprf-muted">Notices</span>
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold opacity-50">Categories</p>
-                <p className="text-2xl font-serif">{stats.categories}</p>
-              </div>
-            </GlassCard>
+              <p className="text-2xl font-serif font-bold text-sprf-navy">{announcements.length}</p>
+              <p className="text-[11px] text-amber-700 font-semibold mt-1">{urgentAnnouncements} urgent</p>
+            </div>
           </Link>
 
-          <Link href="/admin/candidates">
-            <GlassCard className="bg-white/60 p-6 flex items-center gap-4 border-venite-green/5 hover:border-venite-gold/50 hover:bg-white/80 transition-all cursor-pointer h-full">
-              <div className="w-12 h-12 bg-venite-green/10 text-venite-green rounded-full flex items-center justify-center shrink-0">
-                <Users className="w-5 h-5" />
+          <Link href="/admin/faqs" className="group">
+            <div className="sprf-card rounded-2xl p-5 bg-white group-hover:border-sprf-gold transition-all h-full">
+              <div className="flex items-center justify-between mb-3">
+                <HelpCircle className="w-5 h-5 text-sprf-gold" />
+                <span className="text-[10px] uppercase font-bold text-sprf-muted">FAQs</span>
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-widest font-bold opacity-50">Candidates</p>
-                <p className="text-2xl font-serif">{stats.candidates}</p>
+              <p className="text-2xl font-serif font-bold text-sprf-navy">{faqs.length}</p>
+              <p className="text-[11px] text-sprf-muted mt-1">Knowledge base</p>
+            </div>
+          </Link>
+
+          <Link href="/admin/transport" className="group">
+            <div className="sprf-card rounded-2xl p-5 bg-white group-hover:border-sprf-gold transition-all h-full">
+              <div className="flex items-center justify-between mb-3">
+                <Bus className="w-5 h-5 text-sprf-gold" />
+                <span className="text-[10px] uppercase font-bold text-sprf-muted">Transit</span>
               </div>
-            </GlassCard>
+              <p className="text-2xl font-serif font-bold text-sprf-navy">{transports.length}</p>
+              <p className="text-[11px] text-sprf-muted mt-1">Verified routes</p>
+            </div>
+          </Link>
+
+          <Link href="/admin/leadership" className="group">
+            <div className="sprf-card rounded-2xl p-5 bg-white group-hover:border-sprf-gold transition-all h-full">
+              <div className="flex items-center justify-between mb-3">
+                <Users className="w-5 h-5 text-sprf-gold" />
+                <span className="text-[10px] uppercase font-bold text-sprf-muted">Council</span>
+              </div>
+              <p className="text-2xl font-serif font-bold text-sprf-navy">{leadership.length}</p>
+              <p className="text-[11px] text-sprf-muted mt-1">SPRF Executives</p>
+            </div>
+          </Link>
+
+          <Link href="/admin/messages" className="group">
+            <div className="sprf-card rounded-2xl p-5 bg-white group-hover:border-sprf-gold transition-all h-full">
+              <div className="flex items-center justify-between mb-3">
+                <MessageSquare className="w-5 h-5 text-sprf-gold" />
+                <span className="text-[10px] uppercase font-bold text-sprf-muted">Inquiries</span>
+              </div>
+              <p className="text-2xl font-serif font-bold text-sprf-navy">{messages.length}</p>
+              <p className="text-[11px] text-emerald-700 font-semibold mt-1">{unreadMessages} unread</p>
+            </div>
           </Link>
         </div>
 
-        {/* Quick Links */}
-        <div className="flex flex-wrap gap-4 mb-8">
-          <Link href="/admin/events">
-            <PrimaryButton className="text-xs">Manage Programme Events</PrimaryButton>
-          </Link>
-          <Link href="/admin/categories">
-             <PrimaryButton className="text-xs bg-venite-green/10 text-venite-green hover:bg-venite-green/20">Manage Categories</PrimaryButton>
-          </Link>
-          <Link href="/admin/candidates">
-             <PrimaryButton className="text-xs bg-venite-green/10 text-venite-green hover:bg-venite-green/20">Manage Candidates</PrimaryButton>
-          </Link>
-          <Link href="/admin/payments">
-             <PrimaryButton className="text-xs bg-venite-green/10 text-venite-green hover:bg-venite-green/20">View All Payments</PrimaryButton>
-          </Link>
-          <Link href="/admin/settings">
-             <PrimaryButton className="text-xs bg-venite-green/10 text-venite-green hover:bg-venite-green/20">Site Settings</PrimaryButton>
-          </Link>
+        {/* Action Shortcuts Strip */}
+        <div className="sprf-card rounded-2xl p-6 bg-white space-y-3">
+          <span className="text-xs uppercase font-bold tracking-wider text-sprf-muted block">
+            Content Management Hub
+          </span>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/admin/orientation"
+              className="px-4 py-2.5 rounded-xl bg-sprf-navy text-white text-xs font-semibold hover:bg-sprf-blue transition-colors flex items-center gap-1.5"
+            >
+              <Calendar className="w-3.5 h-3.5 text-sprf-gold" />
+              <span>Manage Orientation Days</span>
+            </Link>
+
+            <Link
+              href="/admin/announcements"
+              className="px-4 py-2.5 rounded-xl bg-sprf-surface hover:bg-sprf-surface-soft border border-sprf-border text-xs font-semibold text-sprf-charcoal transition-colors flex items-center gap-1.5"
+            >
+              <Bell className="w-3.5 h-3.5 text-sprf-muted" />
+              <span>Publish Announcements</span>
+            </Link>
+
+            <Link
+              href="/admin/faqs"
+              className="px-4 py-2.5 rounded-xl bg-sprf-surface hover:bg-sprf-surface-soft border border-sprf-border text-xs font-semibold text-sprf-charcoal transition-colors flex items-center gap-1.5"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-sprf-muted" />
+              <span>Manage FAQs</span>
+            </Link>
+
+            <Link
+              href="/admin/leadership"
+              className="px-4 py-2.5 rounded-xl bg-sprf-surface hover:bg-sprf-surface-soft border border-sprf-border text-xs font-semibold text-sprf-charcoal transition-colors flex items-center gap-1.5"
+            >
+              <Users className="w-3.5 h-3.5 text-sprf-muted" />
+              <span>Executive Council</span>
+            </Link>
+
+            <Link
+              href="/admin/transport"
+              className="px-4 py-2.5 rounded-xl bg-sprf-surface hover:bg-sprf-surface-soft border border-sprf-border text-xs font-semibold text-sprf-charcoal transition-colors flex items-center gap-1.5"
+            >
+              <Bus className="w-3.5 h-3.5 text-sprf-muted" />
+              <span>Transport Terminals</span>
+            </Link>
+
+            <Link
+              href="/admin/settings"
+              className="px-4 py-2.5 rounded-xl bg-sprf-surface hover:bg-sprf-surface-soft border border-sprf-border text-xs font-semibold text-sprf-charcoal transition-colors flex items-center gap-1.5"
+            >
+              <Settings className="w-3.5 h-3.5 text-sprf-muted" />
+              <span>Portal Settings</span>
+            </Link>
+          </div>
         </div>
 
+        {/* 2-Column Split: System Checklist & Recent Inquiries */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Categories & Results */}
-          <GlassCard className="bg-white/50 p-8 border-venite-green/5 overflow-hidden">
-             <h2 className="text-xl font-serif mb-6 text-venite-green">Live Vote Results</h2>
-             <div className="flex flex-col gap-6 max-h-[600px] overflow-y-auto pr-2 scrollbar-hide">
-               {categories.length === 0 ? (
-                 <p className="text-sm opacity-50">No categories found.</p>
-               ) : (
-                 categories.map(cat => (
-                   <div key={cat.id} className="border border-venite-green/10 rounded-2xl p-5 bg-white shadow-sm">
-                     <div className="flex justify-between items-center mb-4">
-                       <h3 className="font-bold text-sm text-venite-green">{cat.name}</h3>
-                       <span className={`text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-sm ${cat.isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                         {cat.isOpen ? 'Voting Open' : 'Closed'}
-                       </span>
-                     </div>
-                     <div className="flex flex-col gap-2">
-                       {cat.candidates.length === 0 ? (
-                         <p className="text-xs opacity-40">No candidates added.</p>
-                       ) : (
-                         cat.candidates.map((cand: any, idx: number) => (
-                           <div key={cand.id} className="flex justify-between items-center text-xs p-2 bg-venite-green/5 rounded-lg">
-                             <div className="flex items-center gap-3">
-                                <span className="font-bold opacity-30 w-4">{idx + 1}</span>
-                                <span>{cand.name}</span>
-                             </div>
-                             <span className="font-mono font-bold text-venite-green bg-venite-gold/20 px-2 py-0.5 rounded">{cand.voteCount}</span>
-                           </div>
-                         ))
-                       )}
-                     </div>
-                   </div>
-                 ))
-               )}
-             </div>
-          </GlassCard>
+          {/* Operational Checklist */}
+          <div className="sprf-card rounded-2xl p-6 sm:p-7 bg-white space-y-4">
+            <h2 className="text-xl font-serif text-sprf-navy">Orientation Operations Checklist</h2>
 
-          {/* Recent Transactions */}
-          <GlassCard className="bg-white/50 p-8 border-venite-green/5 overflow-hidden">
-             <h2 className="text-xl font-serif mb-6 text-venite-green">Recent Transactions</h2>
-             <div className="overflow-x-auto">
-               <table className="w-full text-left text-xs">
-                 <thead>
-                   <tr className="border-b border-venite-green/10 text-[10px] uppercase tracking-widest text-venite-green/50">
-                     <th className="pb-3 pr-4 font-bold">Ref / Email</th>
-                     <th className="pb-3 pr-4 font-bold">Candidate</th>
-                     <th className="pb-3 pr-4 font-bold text-right">Votes</th>
-                     <th className="pb-3 pr-4 font-bold text-right">Amount</th>
-                     <th className="pb-3 font-bold">Status</th>
-                   </tr>
-                 </thead>
-                 <tbody>
-                   {recentTransactions.map(tx => (
-                     <tr key={tx.id} className="border-b border-venite-green/5 last:border-0 hover:bg-white/50 transition-colors">
-                       <td className="py-3 pr-4 truncate max-w-[120px]">
-                         <p className="font-mono truncate">{tx.reference.substring(0, 16)}...</p>
-                         <p className="opacity-60 truncate">{tx.email}</p>
-                       </td>
-                       <td className="py-3 pr-4">
-                         <p className="font-bold">{tx.candidate?.name || 'Unknown'}</p>
-                         <p className="text-[10px] opacity-60 uppercase tracking-widest truncate">{tx.candidate?.category?.name}</p>
-                       </td>
-                       <td className="py-3 pr-4 font-mono font-bold text-right">{tx.voteQuantity}</td>
-                       <td className="py-3 pr-4 font-mono font-bold text-right">NGN {tx.amount}</td>
-                       <td className="py-3 text-right">
-                         <span className={`inline-block py-0.5 px-2 rounded-full text-[10px] uppercase tracking-widest font-bold ${
-                           tx.status === 'success' ? 'bg-green-100 text-green-700' :
-                           tx.status === 'failed' ? 'bg-red-100 text-red-700' :
-                           'bg-yellow-100 text-yellow-700'
-                         }`}>
-                           {tx.status}
-                         </span>
-                       </td>
-                     </tr>
-                   ))}
-                   {recentTransactions.length === 0 && (
-                     <tr>
-                       <td colSpan={5} className="text-center py-8 opacity-50">No transactions recorded yet.</td>
-                     </tr>
-                   )}
-                 </tbody>
-               </table>
-             </div>
-          </GlassCard>
+            <div className="space-y-3 text-xs">
+              <div className="p-3.5 rounded-xl bg-sprf-surface border border-sprf-border/60 flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-sprf-navy block">Official Orientation Window</span>
+                    <span className="text-sprf-muted">{settings.orientationDatesText || siteConfig.orientationDatesText}</span>
+                  </div>
+                </div>
+                <span className="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">Active</span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-sprf-surface border border-sprf-border/60 flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-sprf-navy block">Google Maps Destination Pin</span>
+                    <span className="text-sprf-muted font-mono truncate max-w-[280px] block">
+                      {settings.googleMapsDestination || siteConfig.googleMapsDestination}
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">Active</span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-sprf-surface border border-sprf-border/60 flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-sprf-navy block">Arrival Emergency Helpline</span>
+                    <span className="text-sprf-muted font-mono">{settings.emergencyHelpline || siteConfig.contact.emergencyHelpline}</span>
+                  </div>
+                </div>
+                <span className="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">Active</span>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-sprf-surface border border-sprf-border/60 flex items-start justify-between gap-3">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-sprf-navy block">SPRF Welcome Marshals Deployment</span>
+                    <span className="text-sprf-muted">Main Entrance Gate & Iloro-Ekiti Junction</span>
+                  </div>
+                </div>
+                <span className="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded">Active</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Student Messages */}
+          <div className="sprf-card rounded-2xl p-6 sm:p-7 bg-white space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-serif text-sprf-navy">Recent Inquiries</h2>
+              <Link href="/admin/messages" className="text-xs font-semibold text-sprf-navy hover:text-sprf-gold">
+                View All ({messages.length}) →
+              </Link>
+            </div>
+
+            {messages.length === 0 ? (
+              <div className="p-8 text-center text-xs text-sprf-muted bg-sprf-surface rounded-xl">
+                No student inquiries submitted yet.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {messages.slice(0, 4).map((msg) => (
+                  <div key={msg.id} className="p-3 rounded-xl bg-sprf-surface border border-sprf-border/60 space-y-1 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-sprf-navy">{msg.name}</span>
+                      <span className="text-[10px] font-mono text-sprf-muted">{msg.category}</span>
+                    </div>
+                    <p className="text-sprf-muted truncate">{msg.message}</p>
+                    <div className="flex items-center justify-between pt-1 text-[11px]">
+                      <span className="font-mono text-sprf-muted">{msg.email}</span>
+                      <span className={`px-2 py-0.5 rounded font-bold uppercase text-[9px] ${msg.status === 'unread' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                        {msg.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </section>
+      </main>
     </div>
   );
 }

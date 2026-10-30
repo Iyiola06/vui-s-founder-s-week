@@ -33,44 +33,59 @@ const baseUrl = normalizeBaseUrl(
 );
 
 export const siteConfig = {
-  name: "Venite University Founder's Week 2026",
-  shortName: "Founder's Week 2026",
+  name: 'SPRF | Student Programmer Representative Forum, Venite University',
+  shortName: 'SPRF Venite',
   description:
-    "Official Venite University Founder's Week portal with the event programme, dinner and awards details, and secure student voting.",
+    'Your official guide to SPRF orientation, student arrival, campus directions, announcements, and essential information for Venite University, Iloro-Ekiti.',
   baseUrl,
   locale: 'en_NG',
   ogImagePath: '/opengraph-image',
   organizer: {
-    name: 'Venite University',
+    name: 'SPRF — Student Programmer Representative Forum',
+    institution: 'Venite University',
     url: baseUrl,
   },
   venue: {
-    name: 'Venite University, Iloro-Ekiti',
+    name: 'Venite University Campus',
+    streetAddress: 'KM 2, Ayetoro Road',
     addressLocality: 'Iloro-Ekiti',
-    addressRegion: 'Ekiti',
+    addressRegion: 'Ekiti State',
     addressCountry: 'NG',
   },
   eventWindow: {
-    startDate: '2026-05-11T09:00:00+01:00',
-    endDate: '2026-05-17T18:00:00+01:00',
-    dinnerDate: '2026-05-16T19:00:00+01:00',
+    startDate: '2026-11-16T08:00:00+01:00',
+    endDate: '2026-11-21T18:00:00+01:00',
+    dinnerDate: '2026-11-21T18:00:00+01:00',
   },
   keywords: [
-    "Venite University Founder's Week",
-    "Venite University Founder's Week 2026",
-    'Venite University Iloro-Ekiti',
-    "Founder's Week programme",
-    'Venite dinner and awards voting',
-    'student voting portal Nigeria',
-    'Ekiti university events',
+    'SPRF Venite University',
+    'Student Programmer Representative Forum',
+    'Venite University orientation 2026',
+    'Venite University freshers arrival',
+    'Iloro-Ekiti campus directions',
+    'student arrival guide Nigeria',
+    'Venite University timetable',
+    'Venite University student portal',
+    'SPRF coding community',
+    'Ekiti state university orientation',
   ],
 } as const;
 
 export const publicRoutes = [
-  { path: '/', changeFrequency: 'daily', priority: 1 },
-  { path: '/programme', changeFrequency: 'daily', priority: 0.9 },
-  { path: '/voting', changeFrequency: 'hourly', priority: 0.9 },
-  { path: '/dinner-night', changeFrequency: 'weekly', priority: 0.85 },
+  { path: '/', changeFrequency: 'daily', priority: 1.0 },
+  { path: '/orientation', changeFrequency: 'daily', priority: 0.9 },
+  { path: '/orientation/schedule', changeFrequency: 'daily', priority: 0.9 },
+  { path: '/travel', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/travel/transport', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/freshers-guide', changeFrequency: 'weekly', priority: 0.85 },
+  { path: '/checklist', changeFrequency: 'weekly', priority: 0.85 },
+  { path: '/announcements', changeFrequency: 'daily', priority: 0.85 },
+  { path: '/faq', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/about', changeFrequency: 'monthly', priority: 0.75 },
+  { path: '/leadership', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/contact', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/privacy', changeFrequency: 'yearly', priority: 0.4 },
+  { path: '/terms', changeFrequency: 'yearly', priority: 0.4 },
 ] as const;
 
 export function absoluteUrl(path = '/') {
@@ -88,42 +103,6 @@ function getFormatter(options: Intl.DateTimeFormatOptions) {
   });
 }
 
-function parseTimeLabel(value?: string) {
-  if (!value) {
-    return null;
-  }
-
-  const normalizedValue = value.trim();
-  const twelveHourMatch = normalizedValue.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
-
-  if (twelveHourMatch) {
-    const [, hoursText, minutesText = '00', meridiem] = twelveHourMatch;
-    const normalizedHours = Number.parseInt(hoursText, 10) % 12;
-
-    return {
-      hours: normalizedHours + (meridiem.toUpperCase() === 'PM' ? 12 : 0),
-      minutes: Number.parseInt(minutesText, 10),
-    };
-  }
-
-  const twentyFourHourMatch = normalizedValue.match(/^(\d{1,2})(?::(\d{2}))$/);
-
-  if (twentyFourHourMatch) {
-    const [, hoursText, minutesText = '00'] = twentyFourHourMatch;
-
-    return {
-      hours: Number.parseInt(hoursText, 10),
-      minutes: Number.parseInt(minutesText, 10),
-    };
-  }
-
-  return null;
-}
-
-function padTimePart(value: number) {
-  return value.toString().padStart(2, '0');
-}
-
 export function formatEventDate(
   value: Date | string,
   options: Intl.DateTimeFormatOptions = {
@@ -138,41 +117,16 @@ export function formatEventDate(
 export function formatEventDateRange(startValue: Date | string, endValue: Date | string) {
   const startDate = resolveDateValue(startValue);
   const endDate = resolveDateValue(endValue);
-
-  const startYear = getFormatter({ year: 'numeric' }).format(startDate);
-  const endYear = getFormatter({ year: 'numeric' }).format(endDate);
-  const startMonth = getFormatter({ month: 'long' }).format(startDate);
-  const endMonth = getFormatter({ month: 'long' }).format(endDate);
-
-  if (startYear === endYear && startMonth === endMonth) {
-    const startDay = getFormatter({ day: 'numeric' }).format(startDate);
-    const endDay = getFormatter({ day: 'numeric' }).format(endDate);
-
-    return `${startMonth} ${startDay} to ${endDay}, ${startYear}`;
-  }
-
-  if (startYear === endYear) {
-    return `${formatEventDate(startDate, { month: 'long', day: 'numeric' })} to ${formatEventDate(endDate, { month: 'long', day: 'numeric', year: 'numeric' })}`;
-  }
-
-  return `${formatEventDate(startDate)} to ${formatEventDate(endDate)}`;
+  const startDay = getFormatter({ day: 'numeric' }).format(startDate);
+  const endDay = getFormatter({ day: 'numeric' }).format(endDate);
+  const month = getFormatter({ month: 'long' }).format(startDate);
+  const year = getFormatter({ year: 'numeric' }).format(startDate);
+  return `${month} ${startDay} – ${endDay}, ${year}`;
 }
 
 export function buildLagosDateTime(value: Date | string, timeLabel?: string) {
   const date = resolveDateValue(value);
-  const dateParts = getFormatter({
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(date);
-  const partMap = Object.fromEntries(
-    dateParts
-      .filter((part) => part.type !== 'literal')
-      .map((part) => [part.type, part.value])
-  );
-  const parsedTime = parseTimeLabel(timeLabel) ?? { hours: 19, minutes: 0 };
-
-  return `${partMap.year}-${partMap.month}-${partMap.day}T${padTimePart(parsedTime.hours)}:${padTimePart(parsedTime.minutes)}:00+01:00`;
+  return date.toISOString();
 }
 
 function createRobots(noIndex = false): NonNullable<Metadata['robots']> {

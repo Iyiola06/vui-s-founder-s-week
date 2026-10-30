@@ -1,348 +1,447 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
-import { logDatabaseIssue } from '@/lib/db';
-import { ArrowRight, Sparkles, Ticket, Award, CalendarDays, Mic2, Star, Users2 } from 'lucide-react';
-import { JsonLd } from '@/components/seo/JsonLd';
-import { FloatingNav } from '@/components/ui/FloatingNav';
-import { Footer } from '@/components/ui/Footer';
-import { absoluteUrl, createMetadata, siteConfig } from '@/lib/seo';
+import { Navbar } from '@/components/navigation/Navbar';
+import { Footer } from '@/components/navigation/Footer';
+import { JourneyPlanner } from '@/components/travel/JourneyPlanner';
+import { getOrientationDays, getAnnouncements } from '@/lib/data-store';
+import { siteConfig as seoConfig, createMetadata, absoluteUrl } from '@/lib/seo';
+import { siteConfig } from '@/lib/config';
+import {
+  Compass,
+  Calendar,
+  CheckSquare,
+  ArrowRight,
+  MapPin,
+  Clock,
+  ShieldCheck,
+  BookOpen,
+  Code2,
+  Users,
+  Bell,
+  Sparkles,
+  FileText,
+  AlertTriangle,
+} from 'lucide-react';
 
-type EventDayLike = {
-  id?: string;
-  title: string;
-  description: string | null;
-  date: Date | string;
-  isSaturday?: boolean;
-};
-
-const fallbackEvents: EventDayLike[] = [
-  { title: 'Debate and Talk Show', description: 'Students engage in intellectual discourse on national development.', date: new Date('2026-05-11') },
-  { title: 'College Lectures', description: 'Academic showcase from Agriculture, Computing and Engineering.', date: new Date('2026-05-12') },
-  { title: 'Talent Show', description: 'A night of music, art, and creative performances.', date: new Date('2026-05-13') },
-  { title: 'Cultural Day', description: 'Celebrating our extraordinary Nigerian heritage.', date: new Date('2026-05-14') },
-  { title: "Founder's Day Ceremony", description: "The official Founder's Day event.", date: new Date('2026-05-15') },
-  { title: 'Sports & Dinner Awards', description: 'Morning athletics followed by the grand elegance dinner.', date: new Date('2026-05-16'), isSaturday: true },
-  { title: 'Thanksgiving', description: 'A Sunday service of gratitude to conclude the week.', date: new Date('2026-05-17') },
-];
-
-export const revalidate = 900;
+export const revalidate = 300;
 
 export const metadata: Metadata = createMetadata({
-  title: 'Official Event Portal',
+  title: 'SPRF | Student Programmer Representative Forum, Venite University',
   description:
-    "Explore the official Venite University Founder's Week 2026 portal for the full programme, dinner and awards updates, and secure student voting.",
+    'Your official guide to SPRF orientation, student arrival, campus directions, announcements, and essential information for Venite University, Iloro-Ekiti.',
   path: '/',
-  keywords: [
-    "Venite University Founder's Week portal",
-    "Founder's Week 2026 schedule",
-    'Venite University voting portal',
-  ],
 });
 
-export default async function Home() {
-  let eventDays: EventDayLike[] = [];
-  let categories: any[] = [];
+export default async function HomePage() {
+  const [days, announcements] = await Promise.all([
+    getOrientationDays(),
+    getAnnouncements(),
+  ]);
 
-  try {
-    eventDays = await prisma.eventDay.findMany({
-      orderBy: { date: 'asc' },
-    });
-
-    categories = await prisma.votingCategory.findMany({
-      where: { isOpen: true },
-      take: 4,
-      include: {
-        _count: {
-          select: { candidates: true }
-        }
-      }
-    });
-  } catch (error) {
-    logDatabaseIssue('home page data', error);
-  }
-
-  const displayEvents = eventDays.length > 0 ? eventDays : fallbackEvents;
-  const firstEvent = displayEvents[0];
-  const lastEvent = displayEvents[displayEvents.length - 1];
-
-  const festivalJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Festival',
-    name: siteConfig.name,
-    description:
-      "Official Venite University Founder's Week 2026 programme featuring academic events, culture, sports, dinner and awards, and thanksgiving.",
-    url: siteConfig.baseUrl,
-    image: [absoluteUrl(siteConfig.ogImagePath)],
-    startDate: firstEvent ? new Date(firstEvent.date).toISOString() : siteConfig.eventWindow.startDate,
-    endDate: lastEvent ? new Date(lastEvent.date).toISOString() : siteConfig.eventWindow.endDate,
-    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    eventStatus: 'https://schema.org/EventScheduled',
-    location: {
-      '@type': 'Place',
-      name: siteConfig.venue.name,
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: siteConfig.venue.addressLocality,
-        addressRegion: siteConfig.venue.addressRegion,
-        addressCountry: siteConfig.venue.addressCountry,
-      },
-    },
-    organizer: {
-      '@type': 'CollegeOrUniversity',
-      name: siteConfig.organizer.name,
-      url: siteConfig.organizer.url,
-    },
-    subEvent: displayEvents.map((event) => ({
-      '@type': 'Event',
-      name: event.title,
-      description: event.description ?? undefined,
-      startDate: new Date(event.date).toISOString(),
-      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-      eventStatus: 'https://schema.org/EventScheduled',
-      location: {
-        '@type': 'Place',
-        name: siteConfig.venue.name,
-      },
-    })),
-  };
-
-  const featuredCategoriesJsonLd =
-    categories.length > 0
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'ItemList',
-          name: 'Featured Founder\'s Week award categories',
-          itemListElement: categories.map((category, index) => ({
-            '@type': 'ListItem',
-            position: index + 1,
-            item: {
-              '@type': 'Thing',
-              name: category.name,
-              description:
-                category.description ??
-                `${category._count.candidates} nominees available for voting.`,
-            },
-          })),
-        }
-      : null;
+  const featuredDays = days.slice(0, 3);
+  const featuredAnnouncements = announcements.slice(0, 3);
 
   return (
-    <div className="w-full min-h-screen bg-cream text-text-dark font-sans overflow-x-hidden selection:bg-champagne-gold selection:text-text-dark">
-      <FloatingNav />
-      <main>
-        <JsonLd data={featuredCategoriesJsonLd ? [festivalJsonLd, featuredCategoriesJsonLd] : festivalJsonLd} />
+    <div className="w-full min-h-screen flex flex-col bg-sprf-surface text-sprf-charcoal">
+      <Navbar />
 
-        {/* 1. Cinematic Hero */}
-        <section className="relative min-h-[95vh] w-full flex flex-col justify-center items-center px-6 pt-32 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] max-w-[800px] h-[80vw] max-h-[800px] radial-glow rounded-full opacity-60 pointer-events-none" />
-        <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] radial-glow-gold rounded-full opacity-30 pointer-events-none blur-3xl" />
-        
-        <div className="z-10 flex flex-col items-center text-center max-w-5xl mx-auto w-full">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-warm-border bg-white/30 backdrop-blur-md mb-8 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-champagne-gold animate-pulse" />
-            <span className="text-[10px] uppercase font-bold tracking-widest text-text-dark/80">Venite University, Iloro-Ekiti</span>
-          </div>
+      <main className="flex-1">
+        {/* 1. Cinematic Hero Section */}
+        <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-sprf-border/60">
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[900px] h-[500px] radial-glow-gold rounded-full opacity-40 pointer-events-none" />
 
-          <h1 className="text-5xl md:text-7xl lg:text-9xl font-serif text-text-dark tracking-tighter leading-[1.05] mb-6 drop-shadow-sm">
-            Founder&apos;s <br className="hidden md:block"/>
-            <span className="italic font-light text-deep-green">Week 2026</span>
-          </h1>
-
-          <p className="text-base md:text-xl text-muted-text font-light max-w-2xl balance mb-12 leading-relaxed">
-            Join Venite University Iloro-Ekiti for Founder&apos;s Week 2026, a week-long celebration of vision, excellence, culture, talent, sports, awards, and thanksgiving.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <Link href="/programme" className="w-full sm:w-auto px-8 py-4 rounded-full bg-deep-green text-cream font-medium text-sm hover:bg-luxury-green transition-all shadow-xl shadow-deep-green/10 hover:shadow-deep-green/20 hover:-translate-y-0.5 text-center flex items-center justify-center gap-2">
-              Explore Programme <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="/voting" className="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-text-dark border border-warm-border font-medium text-sm hover:bg-cream-soft hover:border-champagne-gold transition-all text-center group">
-              Vote for Awards <span className="inline-block group-hover:translate-x-1 transition-transform"> </span>
-            </Link>
-          </div>
-
-          {/* Floating Feature Pills */}
-          <div className="mt-20 md:mt-32 flex flex-wrap justify-center gap-4 md:gap-8 opacity-80">
-            <div className="flex items-center gap-3 glass-panel px-6 py-3 rounded-full text-sm font-medium">
-              <CalendarDays className="w-4 h-4 text-champagne-gold" /> 7 Days
-            </div>
-            <div className="flex items-center gap-3 glass-panel px-6 py-3 rounded-full text-sm font-medium">
-              <Sparkles className="w-4 h-4 text-champagne-gold" /> Dinner & Awards
-            </div>
-            <div className="flex items-center gap-3 glass-panel px-6 py-3 rounded-full text-sm font-medium">
-              <Award className="w-4 h-4 text-champagne-gold" /> Paid Voting
-            </div>
-          </div>
-        </div>
-        </section>
-
-        {/* 2. Visual Programme Rail */}
-        <section className="py-32 w-full border-t border-warm-border/50 bg-white/30 relative">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div>
-              <h2 className="text-3xl md:text-5xl font-serif text-text-dark tracking-tight mb-4">The Schedule</h2>
-              <p className="text-muted-text max-w-md">Our curated week of extraordinary events.</p>
-            </div>
-            <Link href="/programme" className="text-xs uppercase tracking-widest font-bold text-deep-green hover:text-champagne-gold transition-colors flex items-center gap-1 group">
-              Full Timetable <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="flex overflow-x-auto pb-12 -mx-6 px-6 lg:mx-0 lg:px-0 gap-6 snap-x snap-mandatory scrollbar-hide">
-            {displayEvents.map((day: any, i: number) => {
-              const isSaturday = day.title.toLowerCase().includes('saturday') || day.isSaturday;
-              return (
-                <div key={day.id || i} className={`snap-center shrink-0 w-[85vw] sm:w-[340px] rounded-3xl p-8 flex flex-col justify-between transition-all duration-500 hover:-translate-y-2 group ${isSaturday ? 'glass-panel-dark' : 'glass-panel hover:bg-white/80'}`}>
-                  <div>
-                    <div className="flex justify-between items-start mb-6">
-                      <span className={`text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full ${isSaturday ? 'bg-champagne-gold/20 text-champagne-gold' : 'bg-deep-green/10 text-deep-green'}`}>
-                        {new Date(day.date).toLocaleDateString('en-US', { weekday: 'long' })}
-                      </span>
-                      {isSaturday && <Star className="w-5 h-5 text-champagne-gold fill-champagne-gold" />}
-                    </div>
-                    <h3 className={`text-xl font-serif leading-tight mb-3 ${isSaturday ? 'text-cream' : 'text-text-dark'}`}>{day.title}</h3>
-                    <p className={`text-sm ${isSaturday ? 'text-white/60' : 'text-muted-text'} line-clamp-3`}>{day.description}</p>
-                  </div>
-                  {isSaturday && (
-                    <div className="mt-8 pt-6 border-t border-white/10">
-                      <span className="text-xs font-medium text-champagne-gold group-hover:text-white transition-colors">Grand Finale -&gt;</span>
-                    </div>
-                  )}
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* Left Column: Headlines & CTAs */}
+              <div className="lg:col-span-7 space-y-6 text-left">
+                {/* Location Identifier */}
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sprf-surface-soft border border-sprf-border text-xs font-semibold text-sprf-navy shadow-xs">
+                  <MapPin className="w-3.5 h-3.5 text-sprf-gold shrink-0" />
+                  <span>Venite University · Iloro-Ekiti, Ekiti State, Nigeria</span>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-        </section>
 
-        {/* 3. Founder's Week Bento Section */}
-        <section className="py-32 w-full bg-cream-soft relative">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-serif text-text-dark tracking-tight mb-4">Five Pillars of Celebration</h2>
-            <p className="text-muted-text max-w-xl mx-auto">Experiencing the best of Venite University.</p>
-          </div>
+                <div className="space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-widest text-sprf-gold">
+                    Student Programmer Representative Forum (SPRF)
+                  </p>
+                  <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif text-sprf-navy tracking-tight leading-[1.08] text-balance">
+                    Your Journey. <br />
+                    Your Community. <br />
+                    <span className="text-sprf-gold italic">Your Future.</span>
+                  </h1>
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[240px]">
-            <div className="glass-panel p-8 rounded-[32px] md:col-span-2 flex flex-col justify-end bg-gradient-to-br from-white/60 to-transparent">
-              <Mic2 className="w-8 h-8 text-deep-green mb-auto" />
-              <h3 className="text-2xl font-serif mb-2">Ideas & Dialogue</h3>
-              <p className="text-muted-text text-sm max-w-sm">Debates, talk shows, and lectures shaping the national discourse.</p>
-            </div>
-            <div className="glass-panel p-8 rounded-[32px] flex flex-col justify-end bg-gradient-to-tr from-white/60 to-transparent">
-              <Users2 className="w-8 h-8 text-deep-green mb-auto" />
-              <h3 className="text-2xl font-serif mb-2">Culture</h3>
-              <p className="text-muted-text text-sm">A vibrant display of Nigerian heritage.</p>
-            </div>
-            <div className="glass-panel p-8 rounded-[32px] flex flex-col justify-end bg-gradient-to-tr from-white/60 to-transparent">
-              <Ticket className="w-8 h-8 text-deep-green mb-auto" />
-              <h3 className="text-2xl font-serif mb-2">Talent</h3>
-              <p className="text-muted-text text-sm">Showcasing creative brilliance.</p>
-            </div>
-            <div className="glass-panel-dark p-8 rounded-[32px] md:col-span-2 flex flex-col justify-end relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-champagne-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              <Award className="w-8 h-8 text-champagne-gold mb-auto relative z-10" />
-              <div className="relative z-10">
-                <h3 className="text-2xl font-serif mb-2 text-cream">Sports & Awards</h3>
-                <p className="text-white/60 text-sm max-w-sm">From the track to the red carpet-honoring our finest.</p>
+                <p className="text-base sm:text-lg text-sprf-muted leading-relaxed font-light max-w-xl">
+                  Welcome to Venite University. Your official digital guide to orientation week, campus arrival logistics, peer tech mentorship, and starting your university journey with confidence.
+                </p>
+
+                {/* Date-Aware Orientation Bar */}
+                <div className="p-4 rounded-2xl bg-white border border-sprf-border shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 max-w-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-sprf-navy/5 text-sprf-navy flex items-center justify-center shrink-0">
+                      <Calendar className="w-5 h-5 text-sprf-gold" />
+                    </div>
+                    <div>
+                      <span className="text-[11px] uppercase tracking-wider font-bold text-sprf-muted block">
+                        Official Orientation Window
+                      </span>
+                      <span className="text-xs sm:text-sm font-semibold text-sprf-navy">
+                        {siteConfig.orientationDatesText}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 self-start sm:self-auto">
+                    Verified Schedule
+                  </span>
+                </div>
+
+                {/* Primary & Secondary CTAs */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                  <Link
+                    href="/orientation"
+                    className="px-7 py-4 rounded-xl bg-sprf-navy hover:bg-sprf-blue text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
+                  >
+                    <span>Explore Orientation</span>
+                    <ArrowRight className="w-4 h-4 text-sprf-gold" />
+                  </Link>
+
+                  <Link
+                    href="/travel"
+                    className="px-7 py-4 rounded-xl bg-white border border-sprf-border text-sprf-charcoal text-xs font-bold uppercase tracking-wider hover:bg-sprf-surface hover:border-sprf-gold flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Compass className="w-4 h-4 text-sprf-navy" />
+                    <span>Plan Your Journey</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Right Column: Hero Visual Asset */}
+              <div className="lg:col-span-5 relative">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-white/80 aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3]">
+                  <Image
+                    src={siteConfig.images.hero}
+                    alt="Venite University students in collaborative study commons"
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 45vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-sprf-navy/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 p-3 rounded-xl bg-white/90 backdrop-blur-md border border-white/40 text-xs text-sprf-navy flex items-center justify-between">
+                    <div>
+                      <span className="font-bold block">SPRF Student Leadership</span>
+                      <span className="text-sprf-muted text-[11px]">Mentoring 100L Freshers</span>
+                    </div>
+                    <Link href="/about" className="text-[11px] font-bold text-sprf-gold hover:underline">
+                      Learn More →
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
         </section>
 
-        {/* 4. Grand Finale Split Section */}
-        <section className="py-32 w-full bg-deep-green text-cream relative overflow-hidden">
-        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] radial-glow-gold rounded-full opacity-20 -translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <span className="inline-block px-3 py-1 rounded-full border border-champagne-gold/30 text-champagne-gold text-[10px] uppercase font-bold tracking-widest mb-6 bg-champagne-gold/5">Saturday Night</span>
-              <h2 className="text-4xl sm:text-5xl lg:text-7xl font-serif tracking-tight leading-[1.1] mb-6">A Night of <br/><span className="italic text-champagne-gold">Absolute Elegance.</span></h2>
-              <p className="text-white/60 text-lg sm:text-xl font-light mb-10 max-w-md">
-                The climax of Founder&apos;s Week. Walk the red carpet, celebrate outstanding peers, and experience a dinner crafted for royalty.
+        {/* 2. Key Pillars / Five Questions Section */}
+        <section className="py-16 bg-white border-b border-sprf-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="space-y-3 p-6 rounded-2xl bg-sprf-surface border border-sprf-border/60">
+                <div className="w-10 h-10 rounded-xl bg-sprf-navy text-sprf-gold flex items-center justify-center">
+                  <Compass className="w-5 h-5" />
+                </div>
+                <h3 className="text-xl font-serif text-sprf-navy">Arrive With Confidence</h3>
+                <p className="text-xs text-sprf-muted leading-relaxed font-light">
+                  Direct Google Maps navigation from Lagos, Ibadan, Abuja, or any Nigerian hub straight to the university gates, plus verified transit advice.
+                </p>
+                <Link href="/travel" className="inline-flex items-center gap-1 text-xs font-bold text-sprf-navy hover:text-sprf-gold pt-1">
+                  View Travel Planner <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="space-y-3 p-6 rounded-2xl bg-sprf-surface border border-sprf-border/60">
+                <div className="w-10 h-10 rounded-xl bg-sprf-navy text-sprf-gold flex items-center justify-center">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <h3 className="text-xl font-serif text-sprf-navy">Structured Timetable</h3>
+                <p className="text-xs text-sprf-muted leading-relaxed font-light">
+                  A day-by-day itinerary of official matriculation briefings, faculty tours, medical screenings, and student society mixers.
+                </p>
+                <Link href="/orientation/schedule" className="inline-flex items-center gap-1 text-xs font-bold text-sprf-navy hover:text-sprf-gold pt-1">
+                  Explore Full Schedule <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="space-y-3 p-6 rounded-2xl bg-sprf-surface border border-sprf-border/60">
+                <div className="w-10 h-10 rounded-xl bg-sprf-navy text-sprf-gold flex items-center justify-center">
+                  <Code2 className="w-5 h-5" />
+                </div>
+                <h3 className="text-xl font-serif text-sprf-navy">SPRF Peer Mentorship</h3>
+                <p className="text-xs text-sprf-muted leading-relaxed font-light">
+                  Join student programmer cohorts, access developer packs, Wi-Fi onboarding, and accelerate your tech trajectory from Day 1.
+                </p>
+                <Link href="/about" className="inline-flex items-center gap-1 text-xs font-bold text-sprf-navy hover:text-sprf-gold pt-1">
+                  Discover SPRF Tracks <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. The Signature Feature: Interactive Journey Planner Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-sprf-surface border-b border-sprf-border">
+          <div className="max-w-7xl mx-auto space-y-8">
+            <div className="max-w-2xl">
+              <span className="text-xs font-bold uppercase tracking-wider text-sprf-gold block mb-2">
+                Travel & Campus Arrival
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-serif text-sprf-navy tracking-tight">
+                Getting to Venite should be the easy part.
+              </h2>
+              <p className="text-sm text-sprf-muted mt-3 leading-relaxed font-light">
+                Whether travelling from Lagos, Ibadan, Akure, Abuja, or across Nigeria, enter your departure location below to open turn-by-turn directions in Google Maps.
               </p>
-              <Link href="/dinner-night">
-                <button className="px-8 py-4 rounded-full bg-champagne-gold text-deep-green font-bold text-sm hover:bg-white transition-all shadow-xl shadow-champagne-gold/10">
-                  Dinner Details
-                </button>
+            </div>
+
+            <JourneyPlanner />
+
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-2 text-xs text-sprf-muted">
+              <span>Looking for verified regional bus parks and fares?</span>
+              <Link href="/travel/transport" className="font-semibold text-sprf-navy hover:text-sprf-gold flex items-center gap-1">
+                Read the Regional Transport Guide <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-            
-            <div className="relative h-[400px] sm:h-[500px] w-full">
-              {/* Abstract Floating Cards representing the night */}
-              <div className="absolute top-0 right-0 w-[80%] h-[60%] glass-panel-dark border-white/20 rounded-[32px] p-8 flex flex-col justify-between transform rotate-3 hover:rotate-1 transition-transform duration-500 shadow-2xl">
-                <div className="flex justify-between items-center opacity-50">
-                  <span className="text-xs uppercase font-bold tracking-widest text-champagne-gold">Dress Code</span>
-                  <Star className="w-4 h-4 text-champagne-gold" />
-                </div>
-                <h3 className="text-3xl font-serif">Black Tie & <br/>Glamour</h3>
+          </div>
+        </section>
+
+        {/* 4. Orientation Highlights Preview */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-sprf-border">
+          <div className="max-w-7xl mx-auto space-y-12">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-sprf-gold block mb-1">
+                  6 Days of Induction
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-serif text-sprf-navy">
+                  Programme Highlights
+                </h2>
               </div>
-              <div className="absolute bottom-0 left-0 w-[80%] h-[60%] bg-cream text-text-dark rounded-[32px] p-8 flex flex-col justify-between transform -rotate-3 hover:-rotate-1 transition-transform duration-500 shadow-2xl z-10">
-                <div className="flex justify-between items-center opacity-50">
-                  <span className="text-xs uppercase font-bold tracking-widest text-deep-green">Awards</span>
-                  <Award className="w-4 h-4 text-deep-green" />
-                </div>
-                <div>
-                  <h3 className="text-3xl font-serif mb-2 text-deep-green">Live Recognition</h3>
-                  <div className="w-full bg-transparent border border-warm-border h-2 rounded-full overflow-hidden mt-6">
-                    <div className="w-[75%] bg-champagne-gold h-full rounded-full" />
+              <Link
+                href="/orientation/schedule"
+                className="text-xs uppercase font-bold tracking-wider text-sprf-navy hover:text-sprf-gold flex items-center gap-1"
+              >
+                <span>View Full Timetable</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {featuredDays.map((day, index) => (
+                <div
+                  key={day.id}
+                  className="sprf-card sprf-card-hover rounded-2xl p-6 bg-white flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-sprf-gold uppercase tracking-wider">
+                        Day 0{index + 1}
+                      </span>
+                      <span className="font-mono text-sprf-muted">
+                        {new Date(day.eventDate).toLocaleDateString('en-NG', {
+                          weekday: 'short',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-serif text-sprf-navy">{day.title}</h3>
+
+                    <p className="text-xs text-sprf-muted leading-relaxed font-light line-clamp-3">
+                      {day.description}
+                    </p>
+
+                    <div className="pt-2 border-t border-sprf-border/60 space-y-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-sprf-charcoal/70 block">
+                        Featured Sessions:
+                      </span>
+                      {(day.activities || []).slice(0, 2).map((act) => (
+                        <div key={act.id} className="text-xs text-sprf-charcoal flex items-start gap-2">
+                          <Clock className="w-3.5 h-3.5 text-sprf-gold shrink-0 mt-0.5" />
+                          <span className="font-medium truncate">{act.title}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+
+                  <Link
+                    href={`/orientation/day/${day.slug}`}
+                    className="mt-6 pt-3 border-t border-sprf-border text-xs font-bold text-sprf-navy hover:text-sprf-gold flex items-center justify-between"
+                  >
+                    <span>View Day Agenda</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 5. Freshers Arrival Checklist Teaser */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-sprf-surface border-b border-sprf-border">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-6 relative rounded-3xl overflow-hidden shadow-lg border border-sprf-border aspect-[4/3]">
+                <Image
+                  src={siteConfig.images.prep}
+                  alt="Student packing essentials and documents"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="lg:col-span-6 space-y-5">
+                <span className="text-xs font-bold uppercase tracking-wider text-sprf-gold block">
+                  Arrival Readiness
+                </span>
+                <h2 className="text-3xl sm:text-5xl font-serif text-sprf-navy leading-tight">
+                  Never forget a document.
+                </h2>
+                <p className="text-sm text-sprf-muted leading-relaxed font-light">
+                  Use our interactive arrival checklist to track your JAMB slips, original O&apos;Level certificates, passport photographs, hostel necessities, and tech tools. Saved directly on your device.
+                </p>
+
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center gap-3 text-xs font-medium text-sprf-charcoal">
+                    <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>8 mandatory admission documents with photocopy counts</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs font-medium text-sprf-charcoal">
+                    <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Residence hall items & electrical wattage safety guide</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs font-medium text-sprf-charcoal">
+                    <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Printable format with real-time percentage progress bar</span>
+                  </div>
+                </div>
+
+                <div className="pt-4 flex flex-wrap gap-4">
+                  <Link
+                    href="/checklist"
+                    className="px-6 py-3.5 rounded-xl bg-sprf-navy hover:bg-sprf-blue text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-sm"
+                  >
+                    <CheckSquare className="w-4 h-4 text-sprf-gold" />
+                    <span>Open Interactive Checklist</span>
+                  </Link>
+
+                  <Link
+                    href="/freshers-guide"
+                    className="px-6 py-3.5 rounded-xl bg-white border border-sprf-border text-sprf-charcoal text-xs font-bold uppercase tracking-wider hover:bg-sprf-surface"
+                  >
+                    <span>Read Freshers’ Guide</span>
+                  </Link>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         </section>
 
-        {/* 5. Voting Preview */}
-        <section className="py-32 w-full relative">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-serif text-text-dark tracking-tight mb-4">Who takes the crown?</h2>
-            <p className="text-muted-text max-w-xl mx-auto mb-10">Secure, transparent, and live. Support your favorites across various categories.</p>
-            <Link href="/voting">
-              <button className="px-8 py-4 rounded-full bg-text-dark text-cream font-medium text-sm hover:bg-champagne-gold hover:text-text-dark transition-all">
-                Vote Now via Paystack
-              </button>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.length > 0 ? categories.map((cat: any) => (
-              <div key={cat.id} className="glass-panel p-6 rounded-3xl hover:bg-white/80 transition-all group cursor-default">
-                <h4 className="font-serif text-lg text-deep-green mb-1 group-hover:text-champagne-gold transition-colors">{cat.name}</h4>
-                <p className="text-xs text-muted-text mb-6">{cat._count.candidates} Nominees</p>
-                <div className="space-y-3 pb-2">
-                  <div className="w-full bg-warm-border/30 h-1.5 rounded-full overflow-hidden">
-                    <div className="w-[80%] bg-deep-green/20 h-full rounded-full" />
-                  </div>
-                  <div className="w-full bg-warm-border/30 h-1.5 rounded-full overflow-hidden">
-                    <div className="w-[40%] bg-deep-green/10 h-full rounded-full" />
-                  </div>
-                  <div className="w-full bg-warm-border/30 h-1.5 rounded-full overflow-hidden">
-                    <div className="w-[20%] bg-deep-green/5 h-full rounded-full" />
-                  </div>
-                </div>
+        {/* 6. Official Announcements Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white border-b border-sprf-border">
+          <div className="max-w-7xl mx-auto space-y-10">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-sprf-gold block mb-1">
+                  Official Communication
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-serif text-sprf-navy">
+                  Latest Announcements
+                </h2>
               </div>
-            )) : (
-              // Empty state fallbacks
-              [1,2,3,4].map(i => (
-                <div key={i} className="glass-panel p-6 rounded-3xl opacity-50">
-                  <div className="h-6 w-32 bg-warm-border rounded-md mb-2 animate-pulse" />
-                  <div className="h-4 w-16 bg-warm-border/50 rounded-md mb-6 animate-pulse" />
-                  <div className="space-y-3 pb-2">
-                    <div className="w-full bg-warm-border/30 h-1.5 rounded-full overflow-hidden" />
-                    <div className="w-full bg-warm-border/30 h-1.5 rounded-full overflow-hidden" />
-                    <div className="w-full bg-warm-border/30 h-1.5 rounded-full overflow-hidden" />
+              <Link
+                href="/announcements"
+                className="text-xs uppercase font-bold tracking-wider text-sprf-navy hover:text-sprf-gold flex items-center gap-1"
+              >
+                <span>View All Notices</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {featuredAnnouncements.map((ann) => (
+                <article
+                  key={ann.id}
+                  className="sprf-card sprf-card-hover rounded-2xl p-6 bg-white flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-sprf-gold uppercase tracking-wider">
+                        {ann.category}
+                      </span>
+                      {ann.priority === 'urgent' && (
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                          Urgent
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="text-lg font-serif text-sprf-navy leading-snug">
+                      {ann.title}
+                    </h3>
+
+                    <p className="text-xs text-sprf-muted leading-relaxed font-light line-clamp-3">
+                      {ann.summary}
+                    </p>
                   </div>
-                </div>
-              ))
-            )}
+
+                  <Link
+                    href={`/announcements/${ann.slug}`}
+                    className="mt-6 pt-3 border-t border-sprf-border text-xs font-bold text-sprf-navy hover:text-sprf-gold flex items-center justify-between"
+                  >
+                    <span>Read notice</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </article>
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
+
+        {/* 7. Student Support / Contact Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-sprf-surface">
+          <div className="max-w-7xl mx-auto">
+            <div className="p-8 sm:p-12 rounded-3xl bg-sprf-navy text-white text-center space-y-6 relative overflow-hidden">
+              <div className="max-w-2xl mx-auto space-y-3 relative z-10">
+                <span className="text-xs font-bold uppercase tracking-widest text-sprf-gold block">
+                  SPRF Student Desk
+                </span>
+                <h2 className="text-3xl sm:text-5xl font-serif text-white">
+                  We are here to support your arrival.
+                </h2>
+                <p className="text-sm text-white/70 leading-relaxed font-light">
+                  Have questions regarding your travel route, clearance documents, or arrival schedule? The SPRF executive team and arrival marshals are standing by to guide you.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-4 pt-2 relative z-10">
+                <Link
+                  href="/contact"
+                  className="px-6 py-3.5 rounded-xl bg-sprf-gold hover:bg-sprf-gold-light text-sprf-navy text-xs font-bold uppercase tracking-wider shadow-md transition-colors"
+                >
+                  Contact SPRF Helpdesk
+                </Link>
+                <Link
+                  href="/faq"
+                  className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold border border-white/20 transition-colors"
+                >
+                  Browse FAQs
+                </Link>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 

@@ -1,6 +1,8 @@
 {
-  "name": "Venite Founder's Week",
-  "description": "Premium Founder's Week event portal for Venite University featuring schedules and student voting.",
+  "name": "SPRF Orientation & Student Arrival Portal",
+  "description": "Official SPRF Orientation Week & Student Arrival Portal for Venite University, Iloro-Ekiti, Ekiti State, Nigeria.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
