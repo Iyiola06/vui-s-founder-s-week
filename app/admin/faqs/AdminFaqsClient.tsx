@@ -150,7 +150,7 @@ export default function AdminFaqsClient({ initialFaqs }: Props) {
               <option value="Admissions & Documents">Admissions & Documents</option>
               <option value="Accommodation">Accommodation & Hostels</option>
               <option value="Orientation Week">Orientation Week</option>
-              <option value="SPRF & Tech">SPRF & Tech Cohorts</option>
+              <option value="SPRF Representation">SPRF Representation & Student Welfare</option>
             </select>
           </div>
 

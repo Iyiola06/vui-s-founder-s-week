@@ -47,7 +47,7 @@ const CHECKLIST_SECTIONS: {
   {
     category: 'Computing & Academic Supplies',
     icon: Laptop,
-    description: 'Technical equipment and supplies to hit the ground running with SPRF coding cohorts.',
+    description: 'Essential digital tools, study devices, and academic supplies for lectures, research, and coursework across all faculties.',
     items: [
       { id: 'tech-1', category: 'Tech', text: 'Laptop computer & charger with compatible power adapter', isCrucial: true },
       { id: 'tech-2', category: 'Tech', text: 'Power extension box / surge protector', isCrucial: true },
@@ -292,7 +292,7 @@ export function ChecklistClient() {
       {/* Official Disclaimer */}
       <div className="p-4 rounded-xl bg-sprf-surface border border-sprf-border text-xs text-sprf-muted leading-relaxed">
         <p>
-          <strong>Disclaimer:</strong> This interactive arrival checklist is an organizational preparation aid designed by the Student Programmer Representative Forum (SPRF). It does not replace or supersede formal directives issued by the Venite University Directorate of Academic Affairs or Directorate of Student Affairs.
+          <strong>Disclaimer:</strong> This interactive arrival checklist is an organizational preparation aid designed by the Student Program Representatives Forum (SPRF). It does not replace or supersede formal directives issued by the Venite University Directorate of Academic Affairs or Directorate of Student Affairs.
         </p>
       </div>
 

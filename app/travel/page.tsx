@@ -49,6 +49,35 @@ export default function TravelPage() {
             </p>
           </div>
 
+          {/* Resumption Date & Arrival Notice */}
+          <div className="p-5 rounded-2xl bg-white border border-sprf-gold/40 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-xl bg-sprf-surface text-sprf-gold-dark shrink-0">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-sprf-gold-dark block">
+                  Recommended Travel Schedule
+                </span>
+                <p className="text-sm text-sprf-charcoal leading-relaxed">
+                  <strong>Resumption &amp; Hostel Move-in:</strong> Saturday, November 14, 2026.
+                  <span className="mx-2 text-sprf-muted">·</span>
+                  <strong>Orientation Begins:</strong> Monday, November 16, 2026.
+                </p>
+                <p className="text-xs text-sprf-muted">
+                  Please aim to arrive during daylight hours (8:00 AM – 5:00 PM) for comfortable room assignment and check-in.
+                </p>
+              </div>
+            </div>
+            <a
+              href={`tel:${siteConfig.contact.emergencyHelpline}`}
+              className="px-4 py-2 rounded-xl bg-sprf-navy hover:bg-sprf-blue text-white text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 shrink-0"
+            >
+              <Phone className="w-3.5 h-3.5 text-sprf-gold" />
+              <span>Arrival Helpdesk</span>
+            </a>
+          </div>
+
           {/* Interactive Route Planner Component */}
           <JourneyPlanner />
 

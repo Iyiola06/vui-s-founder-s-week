@@ -12,7 +12,7 @@ export const revalidate = 300;
 export const metadata: Metadata = createMetadata({
   title: 'SPRF Executive Leadership & Student Representatives',
   description:
-    'Meet the executive council of the Student Programmer Representative Forum at Venite University, guiding student affairs, technical innovation, and arrival orientation.',
+    'Meet the executive council of the Student Program Representatives Forum at Venite University, guiding student advocacy, academic welfare, and arrival orientation across all faculties.',
   path: '/leadership',
 });
 
@@ -35,7 +35,7 @@ export default async function LeadershipPage() {
               SPRF Executive Leadership
             </h1>
             <p className="text-base text-sprf-muted leading-relaxed font-light">
-              The democratically elected student programmer representatives dedicated to serving newly admitted freshers, driving technical capacity, and maintaining university leadership standards.
+              The democratically elected student representatives dedicated to serving all Venite University students across every faculty, advancing student welfare, academic progress, and institutional harmony.
             </p>
           </div>
 

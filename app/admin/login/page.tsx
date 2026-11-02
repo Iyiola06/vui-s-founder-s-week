@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
             <div className="pt-2 text-xs text-sprf-muted flex items-center gap-2 font-mono">
               <span>Venite University</span>
               <span>·</span>
-              <span>Student Programmer Representative Forum</span>
+              <span>Student Program Representatives Forum</span>
             </div>
           </section>
 

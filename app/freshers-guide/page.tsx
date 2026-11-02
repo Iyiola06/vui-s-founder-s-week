@@ -66,7 +66,7 @@ Important Warning: Electric boiling rings, electric hotplates, cookers, and high
     title: 'Travel Preparation & Arrival Timing',
     icon: Compass,
     content: `Ekiti State is centrally accessible from Osun, Ondo, Kogi, and Kwara borders. When travelling, dress comfortably, keep emergency cash separated in smaller denominations, and ensure your phone is charged.
-Target to arrive in Iloro-Ekiti between 8:00 AM and 5:00 PM. SPRF Welcome Marshals are stationed at the main gate until 6:00 PM. If delayed past 6:00 PM, report to the Main Gate Security Post immediately.`,
+Resumption & Hostel Check-in begins on Saturday, November 14, 2026. Target to arrive in Iloro-Ekiti between 8:00 AM and 5:00 PM on Saturday or Sunday so you can settle in comfortably. SPRF Welcome Marshals are stationed at the main gate. The official 6-day Orientation Week commences on Monday, November 16, 2026.`,
   },
   {
     number: '05',
@@ -81,7 +81,7 @@ Target to arrive in Iloro-Ekiti between 8:00 AM and 5:00 PM. SPRF Welcome Marsha
     content: `Your first 48 hours set the tone for your university life:
 1. Locate your assigned room and unpack essential bedding.
 2. Familiarize yourself with campus water points, dining halls, and student marts.
-3. Visit the SPRF Tech Helpdesk in Computer Lab B to set up your student email and Wi-Fi credentials.
+3. Visit the SPRF Helpdesk at the University Auditorium / ICT Centre to assist with student portal and Wi-Fi onboarding.
 4. Keep original documents securely locked in your wardrobe when attending orientation events.`,
   },
   {
@@ -98,10 +98,10 @@ Target to arrive in Iloro-Ekiti between 8:00 AM and 5:00 PM. SPRF Welcome Marsha
   },
   {
     number: '09',
-    title: 'Campus Safety & SPRF Peer Support',
+    title: 'Campus Safety & SPRF Student Advocacy',
     icon: ShieldCheck,
-    content: `Venite University enforces strict security protocols to guarantee a peaceful, disciplined academic environment. Cultism, unauthorized secret societies, drug abuse, examination malpractice, and cyber fraud carry zero-tolerance expulsion penalties.
-Whenever you need advice, technical guidance, or peer support, contact SPRF. We exist to protect, guide, and mentor student programmers and scholars throughout their university stay.`,
+    content: `Venite University enforces strict security protocols to guarantee a peaceful, disciplined academic environment. Cultism, unauthorized secret societies, drug abuse, examination malpractice, and cyber misconduct carry zero-tolerance expulsion penalties.
+Whenever you need advice, academic guidance, or welfare support, contact SPRF. As the university-wide student representative body, we exist to represent, advocate for, and support every student across all faculties and programmes throughout their university journey.`,
   },
 ];
 

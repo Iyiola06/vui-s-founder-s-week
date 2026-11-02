@@ -21,7 +21,7 @@ export const revalidate = 300;
 export const metadata: Metadata = createMetadata({
   title: 'Contact SPRF & Student Support Desk',
   description:
-    'Reach the Student Programmer Representative Forum at Venite University for arrival coordination, document verification guidance, and student support.',
+    'Reach the Student Program Representatives Forum at Venite University for arrival coordination, document verification guidance, and student support.',
   path: '/contact',
 });
 

@@ -47,8 +47,37 @@ export default async function OrientationPage() {
               Orientation <span className="text-sprf-gold italic">Week 2026</span>
             </h1>
             <p className="text-base text-sprf-muted leading-relaxed font-light">
-              Welcome to the beginning of your academic and professional journey at Venite University. SPRF has curated six comprehensive days to help you settle into campus, complete verification, and connect with your peers.
+              Welcome to the beginning of your academic and student life at Venite University. SPRF has curated six comprehensive days to help you settle into campus, complete document verification, and connect with faculty representatives and peers across all programmes.
             </p>
+          </div>
+
+          {/* Resumption & Orientation Dates Notice */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-sprf-gold/15 to-emerald-500/10 border border-sprf-gold/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div className="space-y-1.5">
+              <span className="text-[11px] uppercase tracking-wider font-bold text-sprf-gold-dark block">
+                Official University Arrival Schedule
+              </span>
+              <p className="text-base text-sprf-navy font-serif font-bold">
+                Student Resumption: Saturday, November 14, 2026
+              </p>
+              <p className="text-xs text-sprf-charcoal/80 leading-relaxed font-light">
+                Hostels open for check-in and luggage drop-off on <strong>Saturday, November 14</strong>. The official 6-day SPRF Orientation Week begins on <strong>Monday, November 16</strong> through <strong>Saturday, November 21, 2026</strong>.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <Link
+                href="/travel"
+                className="px-4 py-2 rounded-xl bg-sprf-navy hover:bg-sprf-blue text-white text-xs font-semibold whitespace-nowrap transition-colors"
+              >
+                Directions to Campus
+              </Link>
+              <Link
+                href="/checklist"
+                className="px-4 py-2 rounded-xl bg-white hover:bg-sprf-surface text-sprf-navy text-xs font-semibold whitespace-nowrap transition-colors border border-sprf-border"
+              >
+                Packing Checklist
+              </Link>
+            </div>
           </div>
 
           {/* Key Facts Strip */}
@@ -59,7 +88,7 @@ export default async function OrientationPage() {
               </span>
               <p className="text-lg font-serif text-sprf-navy">Nov 16 – Nov 21, 2026</p>
               <p className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
-                <CheckCircle className="w-3.5 h-3.5" /> Confirmed Calendar
+                <CheckCircle className="w-3.5 h-3.5" /> Resumption: Sat Nov 14
               </p>
             </div>
 

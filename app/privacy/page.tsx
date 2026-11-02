@@ -10,7 +10,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = createMetadata({
   title: 'Privacy Policy',
   description:
-    'Privacy Policy of the Student Programmer Representative Forum (SPRF) Orientation & Arrival Portal for Venite University.',
+    'Privacy Policy of the Student Program Representatives Forum (SPRF) Orientation & Arrival Portal for Venite University.',
   path: '/privacy',
 });
 
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
               Privacy Policy
             </h1>
             <p className="text-xs text-sprf-muted font-mono">
-              Last updated: October 2026 · Student Programmer Representative Forum (SPRF)
+              Last updated: October 2026 · Student Program Representatives Forum (SPRF)
             </p>
           </div>
 
@@ -38,7 +38,7 @@ export default function PrivacyPage() {
             <section className="space-y-2">
               <h2 className="text-lg font-serif text-sprf-navy font-bold">1. Introduction</h2>
               <p>
-                The Student Programmer Representative Forum (&quot;SPRF&quot;, &quot;we&quot;, &quot;our&quot;) is committed to protecting the privacy of students, guardians, and visitors using the Venite University Orientation &amp; Student Arrival Portal. This policy explains our minimal data collection practices.
+                The Student Program Representatives Forum (&quot;SPRF&quot;, &quot;we&quot;, &quot;our&quot;) is committed to protecting the privacy of students, guardians, and visitors using the Venite University Orientation &amp; Student Arrival Portal. This policy explains our minimal data collection practices.
               </p>
             </section>
 

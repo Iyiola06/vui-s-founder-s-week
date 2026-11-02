@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { siteConfig } from '@/lib/config';
-import { MapPin, Mail, Phone, ShieldCheck, Compass, Code, ArrowUpRight } from 'lucide-react';
+import { MapPin, Mail, Phone, ShieldCheck, Compass, ArrowUpRight } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -35,8 +35,8 @@ export function Footer() {
             </div>
 
             <p className="text-sm text-white/70 max-w-sm leading-relaxed">
-              The premier student technological leadership and orientation facilitation body at{' '}
-              <span className="text-white font-medium">Venite University, Iloro-Ekiti</span>. Guiding freshers from home to campus and into successful tech careers.
+              The university-wide student representative and leadership body of{' '}
+              <span className="text-white font-medium">Venite University, Iloro-Ekiti</span>. Fostering representation, student advocacy, academic excellence, and community across all faculties.
             </p>
 
             <div className="pt-2 space-y-2 text-xs text-white/80">
@@ -163,7 +163,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/50">
-          <p>© 2026 SPRF — Student Programmer Representative Forum, Venite University. All rights reserved.</p>
+          <p>© 2026 SPRF — Student Program Representatives Forum, Venite University. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <span className="inline-flex items-center gap-1 text-white/70">
               <span className="w-2 h-2 rounded-full bg-sprf-gold inline-block" />

@@ -9,7 +9,7 @@ export interface OrientationActivityItem {
   startTime: string;
   endTime?: string;
   venue: string;
-  category: 'Academic' | 'Induction' | 'Social' | 'Tech' | 'Tour' | 'Welfare';
+  category: 'Academic' | 'Induction' | 'Social' | 'Community' | 'Tech' | 'Tour' | 'Welfare' | 'Forum';
   speaker?: string;
   isCompulsory: boolean;
   displayOrder: number;
@@ -44,7 +44,7 @@ export interface FaqItem {
   id: string;
   question: string;
   answer: string;
-  category: 'Admissions & Documents' | 'Arrival & Travel' | 'Accommodation' | 'Orientation Week' | 'SPRF & Tech';
+  category: 'Admissions & Documents' | 'Arrival & Travel' | 'Accommodation' | 'Orientation Week' | 'SPRF Representation' | 'SPRF & Tech';
   displayOrder: number;
   status: string;
 }
@@ -236,13 +236,13 @@ export const defaultOrientationDays: OrientationDayItem[] = [
       {
         id: 'act-3-3',
         orientationDayId: 'day-3',
-        title: 'SPRF Developer Orientation & Peer Mentorship Sign-up',
-        description: 'Introduction to tech community tracks: Web & Mobile Engineering, AI/Data, Cloud Infrastructure, and Cyber Security.',
+        title: 'SPRF Student Mentorship & Academic Programme Orientation Registration',
+        description: 'Introduction to SPRF peer mentorship across faculties: Health Sciences, Law, Computing & Applied Sciences, Management & Social Sciences. Meet your faculty and programme representatives.',
         startTime: '04:00 PM',
         endTime: '06:00 PM',
-        venue: 'ICT Innovation Theatre',
-        category: 'Tech',
-        speaker: 'SPRF Executive Council',
+        venue: 'University Main Auditorium & SPRF Secretariat',
+        category: 'Community',
+        speaker: 'SPRF Executive Council & Faculty Representatives',
         isCompulsory: false,
         displayOrder: 3,
         status: 'published',

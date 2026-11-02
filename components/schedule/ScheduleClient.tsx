@@ -29,7 +29,7 @@ export function ScheduleClient({ days }: ScheduleClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'timeline' | 'list'>('timeline');
 
-  const categories = ['all', 'Academic', 'Induction', 'Tech', 'Tour', 'Welfare', 'Social'];
+  const categories = ['all', 'Academic', 'Induction', 'Community', 'Tour', 'Welfare', 'Social'];
 
   // Flatten or filter activities
   const allActivitiesWithDay = days.flatMap((day) =>
@@ -53,8 +53,8 @@ export function ScheduleClient({ days }: ScheduleClientProps) {
         return BookOpen;
       case 'Induction':
         return Award;
-      case 'Tech':
-        return Code2;
+      case 'Community':
+        return Users;
       case 'Tour':
         return Compass;
       case 'Social':

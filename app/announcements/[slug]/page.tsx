@@ -109,7 +109,7 @@ export default async function IndividualAnnouncementPage({ params }: Announcemen
             <div className="pt-6 border-t border-sprf-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-sprf-muted">
               <div>
                 <span className="font-bold text-sprf-navy block">Issued by: SPRF Secretariat</span>
-                <span>Student Programmer Representative Forum, Venite University</span>
+                <span>Student Program Representatives Forum, Venite University</span>
               </div>
 
               <div className="inline-flex items-center gap-1 text-emerald-800 font-semibold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">

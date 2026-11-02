@@ -10,7 +10,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = createMetadata({
   title: 'Terms of Use',
   description:
-    'Terms of Use governing the Student Programmer Representative Forum (SPRF) Orientation & Arrival Portal at Venite University.',
+    'Terms of Use governing the Student Program Representatives Forum (SPRF) Orientation & Arrival Portal at Venite University.',
   path: '/terms',
 });
 
@@ -30,7 +30,7 @@ export default function TermsPage() {
               Terms of Use
             </h1>
             <p className="text-xs text-sprf-muted font-mono">
-              Last updated: October 2026 · Student Programmer Representative Forum (SPRF)
+              Last updated: October 2026 · Student Program Representatives Forum (SPRF)
             </p>
           </div>
 
@@ -38,7 +38,7 @@ export default function TermsPage() {
             <section className="space-y-2">
               <h2 className="text-lg font-serif text-sprf-navy font-bold">1. Nature of the Portal</h2>
               <p>
-                This digital portal is maintained by the Student Programmer Representative Forum (SPRF) for the benefit of newly admitted and returning students of Venite University, Iloro-Ekiti. The information provided is for educational orientation and arrival planning assistance.
+                This digital portal is maintained by the Student Program Representatives Forum (SPRF) for the benefit of newly admitted and returning students of Venite University, Iloro-Ekiti. The information provided is for educational orientation and arrival planning assistance.
               </p>
             </section>
 
@@ -59,7 +59,7 @@ export default function TermsPage() {
             <section className="space-y-2">
               <h2 className="text-lg font-serif text-sprf-navy font-bold">4. Intellectual Property &amp; Portal Software</h2>
               <p>
-                The software architecture, brand assets, custom user interface design, and orientation guides on this portal are the intellectual property of the Student Programmer Representative Forum and Venite University. Unauthorized duplication is prohibited.
+                The software architecture, brand assets, custom user interface design, and orientation guides on this portal are the intellectual property of the Student Program Representatives Forum and Venite University. Unauthorized duplication is prohibited.
               </p>
             </section>
           </div>

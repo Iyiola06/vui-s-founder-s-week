@@ -87,7 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const organizationJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
-    name: 'Student Programmer Representative Forum (SPRF)',
+    name: 'Student Program Representatives Forum (SPRF)',
     parentOrganization: {
       '@type': 'CollegeOrUniversity',
       name: 'Venite University',
@@ -100,7 +100,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       },
     },
     url: siteConfig.baseUrl,
-    logo: absoluteUrl('/venite-logo.png'),
+    logo: absoluteUrl(siteConfig.logoPath),
   };
 
   const websiteJsonLd = {

@@ -20,7 +20,7 @@ export function FaqClient({ faqs }: FaqClientProps) {
     'Arrival & Travel',
     'Accommodation',
     'Orientation Week',
-    'SPRF & Tech',
+    'SPRF Representation',
   ];
 
   const filteredFaqs = faqs.filter((faq) => {

@@ -118,7 +118,7 @@ export function ContactForm() {
           <option value="Travel & Arrival">Travel Directions & Motor Park Reception</option>
           <option value="Document Clearance">Admission Documents & Clearance Desk</option>
           <option value="Hostel Accommodation">Hostel Room Keys & Bedding Verification</option>
-          <option value="SPRF & Tech Cohort">SPRF Technology Tracks & Coding Mentorship</option>
+          <option value="Academic Representation">Academic Programme Representation & Student Welfare</option>
           <option value="General Inquiry">General Orientation Questions</option>
         </select>
       </div>
